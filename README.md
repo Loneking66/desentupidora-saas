@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Desentupidora SaaS
 
-## Getting Started
+Sistema fullstack de gerenciamento operacional para desentupidoras e prestadores de serviço, desenvolvido com foco em arquitetura moderna, segurança, escalabilidade e experiência do usuário.
 
-First, run the development server:
+O projeto está sendo construído utilizando React/Next.js no frontend e Node.js + TypeScript no backend, seguindo padrões profissionais de engenharia de software, incluindo arquitetura em camadas, autenticação JWT, RBAC (controle de permissões), validações, auditoria de ações e testes automatizados.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+A proposta do sistema é centralizar toda a operação da empresa em uma única plataforma, permitindo o gerenciamento de:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+* chamados técnicos
+* clientes
+* prestadores de serviço
+* status operacionais
+* orçamentos
+* autenticação e permissões
+* auditoria de ações
+* dashboard administrativo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tecnologias Utilizadas
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Frontend
 
-## Learn More
+* React
+* Next.js
+* TypeScript
+* Tailwind CSS
 
-To learn more about Next.js, take a look at the following resources:
+### Backend
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* Node.js
+* Express
+* Prisma ORM
+* PostgreSQL
+* JWT Authentication
+* Bcrypt
+* Joi Validation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Qualidade e Segurança
 
-## Deploy on Vercel
+* Arquitetura em camadas
+* TDD (Test Driven Development)
+* Sanitização de inputs
+* Proteção contra XSS
+* Proteção contra SQL Injection
+* Rate Limiting
+* Logging estruturado
+* Auditoria de ações
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Objetivo do Projeto
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este projeto está sendo desenvolvido como uma forma prática de aprofundar conhecimentos em desenvolvimento fullstack moderno, arquitetura de software, segurança de aplicações web e integração entre IA e engenharia de software.
+
+Além do aprendizado técnico, o objetivo também é construir um produto real, escalável e aplicável ao mercado de prestação de serviços operacionais.
+
