@@ -24,26 +24,6 @@ A proposta do sistema é centralizar toda a operação da empresa em uma única 
 * TypeScript
 * Tailwind CSS
 
-### Backend
-
-* Node.js
-* Express
-* Prisma ORM
-* PostgreSQL
-* JWT Authentication
-* Bcrypt
-* Joi Validation
-
-### Qualidade e Segurança
-
-* Arquitetura em camadas
-* TDD (Test Driven Development)
-* Sanitização de inputs
-* Proteção contra XSS
-* Proteção contra SQL Injection
-* Rate Limiting
-* Logging estruturado
-* Auditoria de ações
 
 ## Objetivo do Projeto
 
