@@ -4,23 +4,41 @@ import React from "react"
 import Sidebar from "@/components/Sidebar"
 import FiltroStatus from "@/components/FiltroStatus"
 import CardChamado from "@/components/CardChamado"
-import { Chamado } from "@/types/chamado"
 
 export default function Page() {
   const [menuAtivo, setMenuAtivo] = React.useState("Chamados");
   const [filtroStatus, setFiltroStatus] = React.useState("Todos");
 
-  const chamados: Chamado[] = [
+  const chamados= [
     { id: 1,
       cliente: "João Silva",
+      telefone: "(11) 98765-4321",
+      endereco: "Rua das Flores, 123",
+      descricao: "Entupimento na pia da cozinha",
+      prioridade: "Alta",
+      valor: 150.00,
+      dataAbertura: "2024-06-01T10:00:00Z",
       status: "Aberto",
+      
     },
     { id: 2,
       cliente: "Maria Santos",
+       telefone: "(11) 98854-5411",
+      endereco: "Rua das Arvores, 503",
+      descricao: "Entupimento no vaso sanitário",
+      prioridade: "Baixa",
+      valor: 300.00,
+      dataAbertura: "2024-06-01T10:00:00Z",
       status: "Em andamento",
     },
     { id: 3,
       cliente: "Carlos Oliveira",
+       telefone: "(11) 98745-3210",
+      endereco: "Rua das Pedras, 203",
+      descricao: "Entupimento de ralo",
+      prioridade: "Média",
+      valor: 450.00,
+      dataAbertura: "2024-06-01T10:00:00Z",
       status: "Finalizado",
     },
   ];
@@ -68,6 +86,12 @@ export default function Page() {
             key={item.id}
             id={item.id}
             cliente={item.cliente}
+            telefone={item.telefone}
+            endereco={item.endereco}
+            descricao={item.descricao}
+            prioridade={item.prioridade}
+            valor={item.valor}
+            dataAbertura={item.dataAbertura}
             status={item.status}
           />
         ))}
