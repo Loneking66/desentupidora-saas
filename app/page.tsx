@@ -1,94 +1,82 @@
 "use client"
 
-import { useState } from "react"
+import React from "react"
+import Sidebar from "@/components/Sidebar"
+import FiltroStatus from "@/components/FiltroStatus"
+import CardChamado from "@/components/CardChamado"
+import { Chamado } from "@/types/chamado"
 
-export default function Home() {
-  const [menuAtivo, setMenuAtivo] = useState("Chamados")
-  const chamados = [
-  { id: 1, cliente: "João Silva", status: "Aberto", descricao: "Entupimento na cozinha" },
-  { id: 2, cliente: "Maria Souza", status: "Em andamento", descricao: "Vazamento no banheiro" },
-  { id: 3, cliente: "Carlos Lima", status: "Finalizado", descricao: "Limpeza de caixa de gordura" },
-]
-  const chamadosFiltrados = chamados.filter((item) => {
-      if (menuAtivo === "Chamados") return true
-    return item.status === menuAtivo
-})  
-  const [filtroStatus, setFiltroStatus] = useState("Todos")
-  const itens = ["Chamados", "Clientes", "Relatórios", "Configurações"]
-    function corStatus(status: string) {
-      if (status === "Aberto") return "text-red-600"
-      if (status === "Em andamento") return "text-yellow-600"
-      if (status === "Finalizado") return "text-green-600"
-  return "text-gray-600"
-}
+export default function Page() {
+  const [menuAtivo, setMenuAtivo] = React.useState("Chamados");
+  const [filtroStatus, setFiltroStatus] = React.useState("Todos");
+
+  const chamados: Chamado[] = [
+    { id: 1,
+      cliente: "João Silva",
+      status: "Aberto",
+    },
+    { id: 2,
+      cliente: "Maria Santos",
+      status: "Em andamento",
+    },
+    { id: 3,
+      cliente: "Carlos Oliveira",
+      status: "Finalizado",
+    },
+  ];
+
+  const chamadosFiltrados =
+  filtroStatus === "Todos"
+    ? chamados
+    : chamados.filter(
+        (item) => item.status === filtroStatus
+      )
+
   return (
-    <div className="flex h-screen">
+  <div className="flex h-screen">
 
-      {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 text-white p-4">
-  <h1 className="text-xl font-bold mb-6">
-    Desentupidora
-  </h1>
+    {/*Sidebar*/}
+    <Sidebar
+  menuAtivo={menuAtivo}
+  setMenuAtivo={setMenuAtivo}
+/>
 
-  <nav className="space-y-2">
-    {itens.map((item) => (
-      <div
-        key={item}
-        onClick={() => setMenuAtivo(item)}
-        className={`p-3 rounded-lg cursor-pointer transition ${
-          menuAtivo === item
-            ? "bg-blue-600"
-            : "hover:bg-gray-800"
-        }`}
-      >
-        {item}
-      </div>
-    ))}
-  </nav>
-</aside>
+    {/* Conteúdo */}
+<main className="flex-1 bg-gray-100 p-6">
+  <div className="mb-6">
+    <h2 className="text-2xl font-bold text-gray-900">
+      {menuAtivo}
+    </h2>
 
-      {/* Conteúdo */}
-     <main className="flex-1 bg-gray-100 p-6">
-  <h2 className="text-2xl font-bold mb-4">
-    {menuAtivo}
-  </h2>
-  <div className="flex gap-2 mb-4">
-  {["Todos", "Aberto", "Em andamento", "Finalizado"].map((status) => (
-    <button
-      key={status}
-      onClick={() => setFiltroStatus(status)}
-      className={`px-3 py-1 rounded ${
-        filtroStatus === status
-          ? "bg-blue-600 text-white"
-          : "bg-white hover:bg-gray-200"
-      }`}
-    >
-      {status}
-    </button>
-  ))}
-</div>  
-  <div className="grid gap-4">
-    {chamadosFiltrados.map((item) => (
-      <div
-        key={item.id}
-        className="bg-white p-4 rounded-xl shadow"
-      >
-        <h3 className="font-bold">
-          #{item.id} - {item.cliente}
-        </h3>
-
-        <p className="text-gray-600">
-          {item.descricao}
-        </p>
-
-        <span className={`text-sm font-bold ${corStatus(item.status)}`}>
-  {item.status}
-</span>
-      </div>
-    ))}
+    <p className="text-gray-500">
+      Visão geral dos chamados da desentupidora
+    </p>
   </div>
+
+  {menuAtivo === "Chamados" && (
+    <>
+      {/* filtros */}
+      <FiltroStatus
+        filtroStatus={filtroStatus}
+        setFiltroStatus={setFiltroStatus}
+      />
+
+      {/* cards */}
+      <div className="grid grid-cols-3 gap-4">
+        {chamadosFiltrados.map((item) => (
+          <CardChamado
+            key={item.id}
+            id={item.id}
+            cliente={item.cliente}
+            status={item.status}
+          />
+        ))}
+      </div>
+    </>
+  )}
 </main>
 
-    </div>
+  </div>
   )
 }
+      
