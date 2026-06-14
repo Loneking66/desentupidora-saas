@@ -10,6 +10,11 @@ export default function Page() {
   const [filtroStatus, setFiltroStatus] = React.useState("Todos")
   const [novoChamadoAberto, setNovoChamadoAberto] = React.useState(false)
   const [telefoneBusca, setTelefoneBusca] = React.useState("")
+  const [nomeCliente, setNomeCliente] = React.useState("")
+  const [clienteNovo, setClienteNovo] = React.useState(false)
+  const [mensagemBusca, setMensagemBusca] = React.useState("")
+  const [telefoneCliente, setTelefoneCliente] = React.useState("")
+  const [enderecoCliente, setEnderecoCliente] = React.useState("")
   const [clienteEncontrado, setClienteEncontrado] = React.useState<null | {
     cliente: string
     telefone: string
@@ -88,8 +93,23 @@ export default function Page() {
 
     if (!chamadoEncontrado) {
       setClienteEncontrado(null)
+
+      setClienteNovo(true)
+      setNomeCliente("")
+      setTelefoneCliente(telefoneBusca)
+      setEnderecoCliente("")
+
+      setMensagemBusca("Cliente não encontrado")
+
+      setTimeout(() => {
+        setMensagemBusca("")
+      }, 3000)
+
       return
     }
+    
+    setMensagemBusca("")
+    setClienteNovo(false)
 
     setClienteEncontrado({
       cliente: chamadoEncontrado.cliente,
@@ -188,6 +208,13 @@ export default function Page() {
                 {clienteEncontrado && (
                   <button
                     type="button"
+                    onClick={() => {
+                      setNomeCliente(clienteEncontrado.cliente)
+                      setTelefoneCliente(clienteEncontrado.telefone)
+                      setEnderecoCliente(clienteEncontrado.endereco)
+                      setClienteEncontrado(null)
+                    }}
+                    
                     className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
                   >
                     <div className="font-medium text-gray-900">
@@ -199,18 +226,49 @@ export default function Page() {
                     </div>
                   </button>
                 )}
+
+                {mensagemBusca && (
+                  <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 shadow-lg">
+                    {mensagemBusca}
+                  </div>
+                )}
               </div>
 
               <input
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                value={nomeCliente}
+                onChange={(event) => setNomeCliente(event.target.value)}
+                readOnly={!clienteNovo && nomeCliente !== ""}
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                  !clienteNovo && nomeCliente !== ""
+                    ? "bg-gray-100"
+                    : "bg-white"
+                }`}
                 placeholder="Nome do cliente"
               />
 
               <input
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                placeholder="Endereço"
+                value={telefoneCliente}
+                onChange={(event) => setTelefoneCliente(event.target.value)}
+                readOnly={!clienteNovo && telefoneCliente !== ""}
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                  !clienteNovo && telefoneCliente !== ""
+                    ? "bg-gray-100"
+                    : "bg-white"
+                }`}
+                placeholder="Telefone do cliente"
               />
 
+              <input
+                value={enderecoCliente}
+                onChange={(event) => setEnderecoCliente(event.target.value)}
+                readOnly={!clienteNovo && enderecoCliente !== ""}
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                  !clienteNovo && enderecoCliente !== ""
+                    ? "bg-gray-100"
+                    : "bg-white"
+                }`}
+                placeholder="Endereço do cliente"
+              />  
               <textarea
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
                 placeholder="Descrição do problema"
