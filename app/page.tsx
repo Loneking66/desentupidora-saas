@@ -17,6 +17,9 @@ export default function Page() {
   const [enderecoCliente, setEnderecoCliente] = React.useState("");
   const [descricaoProblema, setDescricaoProblema] = React.useState("");
   const [prioridade, setPrioridade] = React.useState("Média");
+  // Melhora a experiência do operador.
+  // Ao abrir o formulário, posiciona automaticamente o cursor
+  // no campo de busca por telefone.
   const [clienteEncontrado, setClienteEncontrado] = React.useState<null | {
     cliente: string;
     telefone: string;
@@ -25,6 +28,9 @@ export default function Page() {
 
   const inputTelefoneRef = React.useRef<HTMLInputElement>(null);
 
+  // Estado principal da aplicação.
+  // No futuro os chamados serão carregados da API,
+  // mas atualmente permanecem apenas em memória no frontend.
   const [chamados, setChamados] = React.useState([
     {
       id: 1,
@@ -61,6 +67,9 @@ export default function Page() {
     },
   ]);
 
+  // Métricas derivadas do estado principal.
+  // Sempre que a lista de chamados muda,
+  // os indicadores do dashboard são recalculados automaticamente.
   const totalAbertos = chamados.filter(
     (item) => item.status === "Aberto",
   ).length;
@@ -98,6 +107,10 @@ export default function Page() {
     return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
   }
 
+  // Busca clientes pelo telefone ignorando máscara,
+  // espaços e caracteres especiais.
+  // O mesmo fluxo permite localizar clientes existentes
+  // ou iniciar o cadastro de um novo cliente.
   function buscarCliente() {
     const telefoneDigitado = telefoneBusca.replace(/\D/g, "");
 
@@ -108,6 +121,9 @@ export default function Page() {
     if (!chamadoEncontrado) {
       setClienteEncontrado(null);
 
+      // Cliente não encontrado.
+      // Libera os campos para cadastro de um novo cliente
+      // junto com a abertura do chamado.
       setClienteNovo(true);
       setNomeCliente("");
       setTelefoneCliente(telefoneBusca);
@@ -132,6 +148,9 @@ export default function Page() {
     });
   }
 
+  // Cria um novo chamado utilizando os dados preenchidos
+  // pelo operador. Enquanto não existe backend,
+  // a persistência ocorre apenas em memória.
   function salvarChamado() {
     if (
       !nomeCliente ||
@@ -139,7 +158,8 @@ export default function Page() {
       !enderecoCliente ||
       !descricaoProblema
     ) {
-      alert("Preencha todos os campos obrigatórios");
+      
+          alert("Preencha todos os campos obrigatórios");
       return;
     }
 
@@ -170,6 +190,12 @@ export default function Page() {
     setNovoChamadoAberto(false);
   }
 
+  // Atualiza o status de um chamado específico.
+  // Algumas mudanças de status possuem regras de negócio
+  // que exigem atenção do atendente.
+  // Regra de negócio:
+          // Quando um chamado retorna de "Em andamento" para "Aberto",
+          // o atendente deve verificar o motivo e reatribuir o serviço.
   function alterarStatusChamado(id: number, novoStatus: string) {
     setChamados(
       chamados.map((chamado) => {
@@ -191,6 +217,7 @@ export default function Page() {
     );
   }
 
+  // Remove um chamado da lista após confirmação do operador.
   function excluirChamado(id: number) {
     const confirmar = confirm("Tem certeza que deseja excluir este chamado?");
 
