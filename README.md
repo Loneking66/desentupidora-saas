@@ -2,7 +2,22 @@
 
 Sistema fullstack de gerenciamento operacional para desentupidoras e prestadores de serviço, desenvolvido com foco em arquitetura moderna, segurança, escalabilidade e experiência do usuário.
 
-O projeto está sendo construído utilizando React/Next.js no frontend e Node.js + TypeScript no backend, seguindo padrões profissionais de engenharia de software, incluindo arquitetura em camadas, autenticação JWT, RBAC (controle de permissões), validações, auditoria de ações e testes automatizados.
+## Status
+Em desenvolvimento
+
+## Já implementado
+- Estrutura inicial em Next.js
+- Dashboard inicial
+- Layout base
+- Screenshots do protótipo
+
+## Planejado
+- Backend Node.js
+- Autenticação JWT
+- PostgreSQL
+- Prisma
+- RBAC
+- Testes automatizados
 
 A proposta do sistema é centralizar toda a operação da empresa em uma única plataforma, permitindo o gerenciamento de:
 
