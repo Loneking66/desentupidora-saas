@@ -1,30 +1,29 @@
-"use client"
+"use client";
 
-import React from "react"
-import Sidebar from "@/components/Sidebar"
-import FiltroStatus from "@/components/FiltroStatus"
-import CardChamado from "@/components/CardChamado"
-
+import React from "react";
+import Sidebar from "@/components/Sidebar";
+import FiltroStatus from "@/components/FiltroStatus";
+import CardChamado from "@/components/CardChamado";
 
 export default function Page() {
-  const [menuAtivo, setMenuAtivo] = React.useState("Chamados")
-  const [filtroStatus, setFiltroStatus] = React.useState("Todos")
-  const [novoChamadoAberto, setNovoChamadoAberto] = React.useState(false)
-  const [telefoneBusca, setTelefoneBusca] = React.useState("")
-  const [nomeCliente, setNomeCliente] = React.useState("")
-  const [clienteNovo, setClienteNovo] = React.useState(false)
-  const [mensagemBusca, setMensagemBusca] = React.useState("")
-  const [telefoneCliente, setTelefoneCliente] = React.useState("")
-  const [enderecoCliente, setEnderecoCliente] = React.useState("")
-  const [descricaoProblema, setDescricaoProblema] = React.useState("")
-  const [prioridade, setPrioridade] = React.useState("Média")
+  const [menuAtivo, setMenuAtivo] = React.useState("Chamados");
+  const [filtroStatus, setFiltroStatus] = React.useState("Todos");
+  const [novoChamadoAberto, setNovoChamadoAberto] = React.useState(false);
+  const [telefoneBusca, setTelefoneBusca] = React.useState("");
+  const [nomeCliente, setNomeCliente] = React.useState("");
+  const [clienteNovo, setClienteNovo] = React.useState(false);
+  const [mensagemBusca, setMensagemBusca] = React.useState("");
+  const [telefoneCliente, setTelefoneCliente] = React.useState("");
+  const [enderecoCliente, setEnderecoCliente] = React.useState("");
+  const [descricaoProblema, setDescricaoProblema] = React.useState("");
+  const [prioridade, setPrioridade] = React.useState("Média");
   const [clienteEncontrado, setClienteEncontrado] = React.useState<null | {
-    cliente: string
-    telefone: string
-    endereco: string
-  }>(null)
+    cliente: string;
+    telefone: string;
+    endereco: string;
+  }>(null);
 
-  const inputTelefoneRef = React.useRef<HTMLInputElement>(null)
+  const inputTelefoneRef = React.useRef<HTMLInputElement>(null);
 
   const [chamados, setChamados] = React.useState([
     {
@@ -60,72 +59,89 @@ export default function Page() {
       dataAbertura: "2024-06-01T10:00:00Z",
       status: "Finalizado",
     },
-  ])
+  ]);
+
+  const totalAbertos = chamados.filter(
+    (item) => item.status === "Aberto",
+  ).length;
+
+  const totalEmAndamento = chamados.filter(
+    (item) => item.status === "Em andamento",
+  ).length;
+
+  const totalFinalizados = chamados.filter(
+    (item) => item.status === "Finalizado",
+  ).length;
 
   const chamadosFiltrados =
     filtroStatus === "Todos"
       ? chamados
-      : chamados.filter((item) => item.status === filtroStatus)
+      : chamados.filter((item) => item.status === filtroStatus);
 
   React.useEffect(() => {
     if (novoChamadoAberto) {
-      inputTelefoneRef.current?.focus()
+      inputTelefoneRef.current?.focus();
     }
-  }, [novoChamadoAberto])
+  }, [novoChamadoAberto]);
 
   function formatarTelefone(valor: string) {
-    const numeros = valor.replace(/\D/g, "").slice(0, 11)
+    const numeros = valor.replace(/\D/g, "").slice(0, 11);
 
     if (numeros.length <= 2) {
-      return numeros
+      return numeros;
     }
 
     if (numeros.length <= 7) {
-      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
     }
 
-    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`
+    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
   }
 
   function buscarCliente() {
-    const telefoneDigitado = telefoneBusca.replace(/\D/g, "")
+    const telefoneDigitado = telefoneBusca.replace(/\D/g, "");
 
     const chamadoEncontrado = chamados.find(
-      (item) => item.telefone.replace(/\D/g, "") === telefoneDigitado
-    )
+      (item) => item.telefone.replace(/\D/g, "") === telefoneDigitado,
+    );
 
     if (!chamadoEncontrado) {
-      setClienteEncontrado(null)
+      setClienteEncontrado(null);
 
-      setClienteNovo(true)
-      setNomeCliente("")
-      setTelefoneCliente(telefoneBusca)
-      setEnderecoCliente("")
+      setClienteNovo(true);
+      setNomeCliente("");
+      setTelefoneCliente(telefoneBusca);
+      setEnderecoCliente("");
 
-      setMensagemBusca("Cliente não encontrado")
+      setMensagemBusca("Cliente não encontrado");
 
       setTimeout(() => {
-        setMensagemBusca("")
-      }, 3000)
+        setMensagemBusca("");
+      }, 3000);
 
-      return
+      return;
     }
-    
-    setMensagemBusca("")
-    setClienteNovo(false)
+
+    setMensagemBusca("");
+    setClienteNovo(false);
 
     setClienteEncontrado({
       cliente: chamadoEncontrado.cliente,
       telefone: chamadoEncontrado.telefone,
       endereco: chamadoEncontrado.endereco,
-    })
+    });
   }
 
   function salvarChamado() {
-    if (!nomeCliente || !telefoneCliente || !enderecoCliente || !descricaoProblema) {
-      alert("Preencha todos os campos obrigatórios")
-     return
-   }
+    if (
+      !nomeCliente ||
+      !telefoneCliente ||
+      !enderecoCliente ||
+      !descricaoProblema
+    ) {
+      alert("Preencha todos os campos obrigatórios");
+      return;
+    }
 
     const novoChamado = {
       id: chamados.length + 1,
@@ -137,54 +153,52 @@ export default function Page() {
       valor: 0,
       dataAbertura: new Date().toISOString(),
       status: "Aberto",
-    }
+    };
 
-    setChamados([...chamados, novoChamado])
+    setChamados([...chamados, novoChamado]);
 
-    setNomeCliente("")
-    setTelefoneCliente("")
-    setEnderecoCliente("")
-    setDescricaoProblema("")
-    setPrioridade("Média")
-    setTelefoneBusca("")
-    setClienteEncontrado(null)
-    setMensagemBusca("")
-    setClienteNovo(false)
+    setNomeCliente("");
+    setTelefoneCliente("");
+    setEnderecoCliente("");
+    setDescricaoProblema("");
+    setPrioridade("Média");
+    setTelefoneBusca("");
+    setClienteEncontrado(null);
+    setMensagemBusca("");
+    setClienteNovo(false);
 
-    setNovoChamadoAberto(false)
+    setNovoChamadoAberto(false);
   }
 
   function alterarStatusChamado(id: number, novoStatus: string) {
     setChamados(
       chamados.map((chamado) => {
         if (chamado.id !== id) {
-          return chamado
+          return chamado;
         }
 
         if (chamado.status === "Em andamento" && novoStatus === "Aberto") {
           alert(
-            "Atenção: este chamado voltou de Em andamento para Aberto. Verifique com o prestador e reatribua o atendimento."
-          )
+            "Atenção: este chamado voltou de Em andamento para Aberto. Verifique com o prestador e reatribua o atendimento.",
+          );
         }
 
         return {
           ...chamado,
           status: novoStatus,
-        }
-      })
-    )
-    }
+        };
+      }),
+    );
+  }
 
   function excluirChamado(id: number) {
-    const confirmar = confirm("Tem certeza que deseja excluir este chamado?")
+    const confirmar = confirm("Tem certeza que deseja excluir este chamado?");
 
     if (!confirmar) {
-      return
+      return;
     }
 
-    setChamados(
-      chamados.filter((chamado) => chamado.id !== id)
-    )
+    setChamados(chamados.filter((chamado) => chamado.id !== id));
   }
 
   return (
@@ -193,9 +207,7 @@ export default function Page() {
 
       <main className="flex-1 bg-gray-100 p-6">
         <header className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
-            {menuAtivo}
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900">{menuAtivo}</h2>
 
           <p className="text-gray-500">
             Visão geral dos chamados da desentupidora
@@ -204,6 +216,31 @@ export default function Page() {
 
         {menuAtivo === "Chamados" && (
           <section>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white rounded-2xl shadow p-4 border">
+                <p className="text-sm text-gray-500">📋 Abertos</p>
+
+                <h3 className="text-3xl font-bold text-red-600">
+                  {totalAbertos}
+                </h3>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow p-4 border">
+                <p className="text-sm text-gray-500">🚚 Em andamento</p>
+
+                <h3 className="text-3xl font-bold text-yellow-600">
+                  {totalEmAndamento}
+                </h3>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow p-4 border">
+                <p className="text-sm text-gray-500">✅ Finalizados</p>
+
+                <h3 className="text-3xl font-bold text-green-600">
+                  {totalFinalizados}
+                </h3>
+              </div>
+            </div>
             <FiltroStatus
               filtroStatus={filtroStatus}
               setFiltroStatus={setFiltroStatus}
@@ -233,9 +270,7 @@ export default function Page() {
 
       <aside
         className={`fixed bottom-6 right-6 z-50 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl transition-all duration-300 ease-out ${
-          novoChamadoAberto
-            ? "h-150 w-140 p-6"
-            : "h-14 w-48 p-0"
+          novoChamadoAberto ? "h-150 w-140 p-6" : "h-14 w-48 p-0"
         }`}
       >
         {!novoChamadoAberto && (
@@ -280,12 +315,11 @@ export default function Page() {
                   <button
                     type="button"
                     onClick={() => {
-                      setNomeCliente(clienteEncontrado.cliente)
-                      setTelefoneCliente(clienteEncontrado.telefone)
-                      setEnderecoCliente(clienteEncontrado.endereco)
-                      setClienteEncontrado(null)
+                      setNomeCliente(clienteEncontrado.cliente);
+                      setTelefoneCliente(clienteEncontrado.telefone);
+                      setEnderecoCliente(clienteEncontrado.endereco);
+                      setClienteEncontrado(null);
                     }}
-                    
                     className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
                   >
                     <div className="font-medium text-gray-900">
@@ -339,10 +373,10 @@ export default function Page() {
                     : "bg-white"
                 }`}
                 placeholder="Endereço do cliente"
-              />  
+              />
               <textarea
-              value={descricaoProblema}
-              onChange={(event) => setDescricaoProblema(event.target.value)}
+                value={descricaoProblema}
+                onChange={(event) => setDescricaoProblema(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
                 placeholder="Descrição do problema"
               />
@@ -379,5 +413,5 @@ export default function Page() {
         )}
       </aside>
     </div>
-  )
+  );
 }
