@@ -2,6 +2,8 @@
 
 A fullstack operational management system for drain cleaning companies and field service providers, built with a focus on modern architecture, security, scalability, and user experience.
 
+![Dashboard Preview](docs/dashboard.png)
+
 ## Status
 
 🚧 In Development
