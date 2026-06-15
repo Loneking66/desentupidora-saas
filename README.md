@@ -1,6 +1,8 @@
 # Drain Cleaning Service SaaS
 
-A fullstack operational management system for drain cleaning companies and field service providers, built with a focus on modern architecture, security, scalability, and user experience.
+A service management platform for drain cleaning companies and field service operations.
+
+Currently being built with React, Next.js and TypeScript, with future plans for a Node.js backend and PostgreSQL database.
 
 ![Dashboard Preview](docs/dashboard.png)
 
@@ -10,19 +12,26 @@ A fullstack operational management system for drain cleaning companies and field
 
 ## Implemented
 
-- Initial Next.js project structure
-- Initial dashboard
-- Base application layout
-- Prototype screenshots
+- Customer search by phone number
+- Customer auto-fill workflow
+- Service request creation
+- Service request deletion
+- Status management
+- Real-time dashboard metrics
+- Responsive UI
+- Component-based architecture
 
 ## Planned Features
 
 - Node.js backend
-- JWT authentication
 - PostgreSQL database
 - Prisma ORM
+- JWT authentication
 - Role-Based Access Control (RBAC)
-- Automated testing
+- Service history tracking
+- Field operator mobile app
+- WhatsApp notifications
+- Estimate approval workflow
 
 ## Overview
 
@@ -48,7 +57,7 @@ The goal of this platform is to centralize the entire business operation into a 
 
 ## Project Goal
 
-This project is being developed as a practical way to deepen my knowledge of modern fullstack development, software architecture, web application security, and AI-assisted software engineering.
+This project is being developed as a practical way to deepen my knowledge of modern fullstack development, software architecture, web application security, and modern software development practices.
 
 Beyond the technical learning experience, the objective is to build a real-world, scalable product that can be applied to service-based businesses and field operations.
 ```
