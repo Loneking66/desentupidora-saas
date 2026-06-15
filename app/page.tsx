@@ -175,6 +175,18 @@ export default function Page() {
     )
     }
 
+  function excluirChamado(id: number) {
+    const confirmar = confirm("Tem certeza que deseja excluir este chamado?")
+
+    if (!confirmar) {
+      return
+    }
+
+    setChamados(
+      chamados.filter((chamado) => chamado.id !== id)
+    )
+  }
+
   return (
     <div className="flex h-screen">
       <Sidebar menuAtivo={menuAtivo} setMenuAtivo={setMenuAtivo} />
@@ -211,6 +223,7 @@ export default function Page() {
                   dataAbertura={item.dataAbertura}
                   status={item.status}
                   onAlterarStatus={alterarStatusChamado}
+                  onExcluir={excluirChamado}
                 />
               ))}
             </div>

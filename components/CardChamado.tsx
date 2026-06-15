@@ -22,6 +22,7 @@ interface CardChamadoProps {
     id: number,
     novoStatus: string
   ) => void;
+  onExcluir: (id: number) => void;
 }
 
 export default function CardChamado({
@@ -35,6 +36,7 @@ export default function CardChamado({
   dataAbertura,
   status,
   onAlterarStatus,
+  onExcluir,
 }: CardChamadoProps) {
 
 
@@ -78,7 +80,17 @@ return (
       <span className="text-sm font-bold text-gray-900">
         R$ {valor}
       </span>
+
+      <button
+        type="button"
+        onClick={() => onExcluir(id)}
+        className="text-sm font-semibold text-red-600 hover:text-red-800"
+      >
+        Excluir
+      </button>
+
     </div>
   </div>
+  
 )
 }
