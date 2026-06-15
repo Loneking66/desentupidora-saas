@@ -15,6 +15,8 @@ export default function Page() {
   const [mensagemBusca, setMensagemBusca] = React.useState("")
   const [telefoneCliente, setTelefoneCliente] = React.useState("")
   const [enderecoCliente, setEnderecoCliente] = React.useState("")
+  const [descricaoProblema, setDescricaoProblema] = React.useState("")
+  const [prioridade, setPrioridade] = React.useState("Média")
   const [clienteEncontrado, setClienteEncontrado] = React.useState<null | {
     cliente: string
     telefone: string
@@ -23,7 +25,7 @@ export default function Page() {
 
   const inputTelefoneRef = React.useRef<HTMLInputElement>(null)
 
-  const chamados = [
+  const [chamados, setChamados] = React.useState([
     {
       id: 1,
       cliente: "João Silva",
@@ -57,7 +59,7 @@ export default function Page() {
       dataAbertura: "2024-06-01T10:00:00Z",
       status: "Finalizado",
     },
-  ]
+  ])
 
   const chamadosFiltrados =
     filtroStatus === "Todos"
@@ -116,6 +118,39 @@ export default function Page() {
       telefone: chamadoEncontrado.telefone,
       endereco: chamadoEncontrado.endereco,
     })
+  }
+
+  function salvarChamado() {
+    if (!nomeCliente || !telefoneCliente || !enderecoCliente || !descricaoProblema) {
+      alert("Preencha todos os campos obrigatórios")
+     return
+   }
+
+    const novoChamado = {
+      id: chamados.length + 1,
+      cliente: nomeCliente,
+      telefone: telefoneCliente,
+      endereco: enderecoCliente,
+      descricao: descricaoProblema,
+      prioridade: prioridade,
+      valor: 0,
+      dataAbertura: new Date().toISOString(),
+      status: "Aberto",
+    }
+
+    setChamados([...chamados, novoChamado])
+
+    setNomeCliente("")
+    setTelefoneCliente("")
+    setEnderecoCliente("")
+    setDescricaoProblema("")
+    setPrioridade("Média")
+    setTelefoneBusca("")
+    setClienteEncontrado(null)
+    setMensagemBusca("")
+    setClienteNovo(false)
+
+    setNovoChamadoAberto(false)
   }
 
   return (
@@ -270,11 +305,17 @@ export default function Page() {
                 placeholder="Endereço do cliente"
               />  
               <textarea
+              value={descricaoProblema}
+              onChange={(event) => setDescricaoProblema(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
                 placeholder="Descrição do problema"
               />
 
-              <select className="w-full rounded-lg border border-gray-300 px-3 py-2">
+              <select
+                value={prioridade}
+                onChange={(event) => setPrioridade(event.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              >
                 <option>Alta</option>
                 <option>Média</option>
                 <option>Baixa</option>
@@ -292,6 +333,7 @@ export default function Page() {
 
               <button
                 type="button"
+                onClick={salvarChamado}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Salvar
