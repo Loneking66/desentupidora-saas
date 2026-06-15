@@ -1,48 +1,53 @@
-# Desentupidora SaaS
+```md
+# Drain Cleaning Service SaaS
 
-Sistema fullstack de gerenciamento operacional para desentupidoras e prestadores de serviço, desenvolvido com foco em arquitetura moderna, segurança, escalabilidade e experiência do usuário.
+A fullstack operational management system for drain cleaning companies and field service providers, built with a focus on modern architecture, security, scalability, and user experience.
 
 ## Status
-Em desenvolvimento
 
-## Já implementado
-- Estrutura inicial em Next.js
-- Dashboard inicial
-- Layout base
-- Screenshots do protótipo
+🚧 In Development
 
-## Planejado
-- Backend Node.js
-- Autenticação JWT
-- PostgreSQL
-- Prisma
-- RBAC
-- Testes automatizados
+## Implemented
 
-A proposta do sistema é centralizar toda a operação da empresa em uma única plataforma, permitindo o gerenciamento de:
+- Initial Next.js project structure
+- Initial dashboard
+- Base application layout
+- Prototype screenshots
 
-* chamados técnicos
-* clientes
-* prestadores de serviço
-* status operacionais
-* orçamentos
-* autenticação e permissões
-* auditoria de ações
-* dashboard administrativo
+## Planned Features
 
-## Tecnologias Utilizadas
+- Node.js backend
+- JWT authentication
+- PostgreSQL database
+- Prisma ORM
+- Role-Based Access Control (RBAC)
+- Automated testing
+
+## Overview
+
+The goal of this platform is to centralize the entire business operation into a single system, allowing efficient management of:
+
+- Service orders
+- Customers
+- Field technicians
+- Operational status tracking
+- Estimates and quotations
+- Authentication and authorization
+- Audit logs
+- Administrative dashboard
+
+## Tech Stack
 
 ### Frontend
 
-* React
-* Next.js
-* TypeScript
-* Tailwind CSS
+- React
+- Next.js
+- TypeScript
+- Tailwind CSS
 
+## Project Goal
 
-## Objetivo do Projeto
+This project is being developed as a practical way to deepen my knowledge of modern fullstack development, software architecture, web application security, and AI-assisted software engineering.
 
-Este projeto está sendo desenvolvido como uma forma prática de aprofundar conhecimentos em desenvolvimento fullstack moderno, arquitetura de software, segurança de aplicações web e integração entre IA e engenharia de software.
-
-Além do aprendizado técnico, o objetivo também é construir um produto real, escalável e aplicável ao mercado de prestação de serviços operacionais.
-
+Beyond the technical learning experience, the objective is to build a real-world, scalable product that can be applied to service-based businesses and field operations.
+```
