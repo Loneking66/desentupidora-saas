@@ -17,9 +17,27 @@ interface CardChamadoProps {
   valor: number;
   dataAbertura: string;
   status: string;
+
+  onAlterarStatus: (
+    id: number,
+    novoStatus: string
+  ) => void;
 }
 
-export default function CardChamado({ id, cliente, telefone, endereco, descricao, prioridade, valor, dataAbertura, status }: CardChamadoProps) {
+export default function CardChamado({
+  id,
+  cliente,
+  telefone,
+  endereco,
+  descricao,
+  prioridade,
+  valor,
+  dataAbertura,
+  status,
+  onAlterarStatus,
+}: CardChamadoProps) {
+
+
 return (
    <div className="min-w-0 bg-white p-5 rounded-2xl shadow border border-gray-200">
     <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
@@ -33,10 +51,17 @@ return (
         </p>
       </div>
 
-      <span
-  className={`w-fit px-3 py-1 rounded-full text-sm font-semibold ${corStatus(status)}`}
->         {status}
-</span>
+      <select
+  value={status}
+  onChange={(event) =>
+    onAlterarStatus(id, event.target.value)
+  }
+  className={`mt-2 w-full rounded-lg border px-2 py-1 font-semibold ${corStatus(status)}`}
+>
+  <option>Aberto</option>
+  <option>Em andamento</option>
+  <option>Finalizado</option>
+</select>
     </div>
 
     <div className="space-y-2 text-sm text-gray-700">

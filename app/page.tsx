@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar"
 import FiltroStatus from "@/components/FiltroStatus"
 import CardChamado from "@/components/CardChamado"
 
+
 export default function Page() {
   const [menuAtivo, setMenuAtivo] = React.useState("Chamados")
   const [filtroStatus, setFiltroStatus] = React.useState("Todos")
@@ -153,6 +154,27 @@ export default function Page() {
     setNovoChamadoAberto(false)
   }
 
+  function alterarStatusChamado(id: number, novoStatus: string) {
+    setChamados(
+      chamados.map((chamado) => {
+        if (chamado.id !== id) {
+          return chamado
+        }
+
+        if (chamado.status === "Em andamento" && novoStatus === "Aberto") {
+          alert(
+            "Atenção: este chamado voltou de Em andamento para Aberto. Verifique com o prestador e reatribua o atendimento."
+          )
+        }
+
+        return {
+          ...chamado,
+          status: novoStatus,
+        }
+      })
+    )
+    }
+
   return (
     <div className="flex h-screen">
       <Sidebar menuAtivo={menuAtivo} setMenuAtivo={setMenuAtivo} />
@@ -188,6 +210,7 @@ export default function Page() {
                   valor={item.valor}
                   dataAbertura={item.dataAbertura}
                   status={item.status}
+                  onAlterarStatus={alterarStatusChamado}
                 />
               ))}
             </div>
@@ -198,7 +221,7 @@ export default function Page() {
       <aside
         className={`fixed bottom-6 right-6 z-50 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl transition-all duration-300 ease-out ${
           novoChamadoAberto
-            ? "h-[600px] w-[560px] p-6"
+            ? "h-150 w-140 p-6"
             : "h-14 w-48 p-0"
         }`}
       >
