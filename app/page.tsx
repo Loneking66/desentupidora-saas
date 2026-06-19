@@ -2,31 +2,31 @@
 
 import React from "react";
 import Sidebar from "@/components/Sidebar";
-import FiltroStatus from "@/components/FiltroStatus";
-import CardChamado from "@/components/CardChamado";
+import StatusFilter from "@/components/StatusFilter";
+import ServiceRequestCard from "@/components/ServiceRequestCard";
 
 export default function Page() {
-  const [menuAtivo, setMenuAtivo] = React.useState("Chamados");
-  const [filtroStatus, setFiltroStatus] = React.useState("Todos");
-  const [novoChamadoAberto, setNovoChamadoAberto] = React.useState(false);
-  const [telefoneBusca, setTelefoneBusca] = React.useState("");
-  const [nomeCliente, setNomeCliente] = React.useState("");
-  const [clienteNovo, setClienteNovo] = React.useState(false);
+  const [menuAtivo, setMenuAtivo] = React.useState("Service Requests");
+  const [filtroStatus, setFiltroStatus] = React.useState("All");
+  const [novoChamadoOpen, setNovoChamadoOpen] = React.useState(false);
+  const [phoneBusca, setphoneBusca] = React.useState("");
+  const [nomecustomer, setNomecustomer] = React.useState("");
+  const [customerNovo, setcustomerNovo] = React.useState(false);
   const [mensagemBusca, setMensagemBusca] = React.useState("");
-  const [telefoneCliente, setTelefoneCliente] = React.useState("");
-  const [enderecoCliente, setEnderecoCliente] = React.useState("");
-  const [descricaoProblema, setDescricaoProblema] = React.useState("");
-  const [prioridade, setPrioridade] = React.useState("Média");
+  const [phonecustomer, setphonecustomer] = React.useState("");
+  const [addresscustomer, setaddresscustomer] = React.useState("");
+  const [descriptionProblema, setdescriptionProblema] = React.useState("");
+  const [priority, setpriority] = React.useState("Média");
   // Melhora a experiência do operador.
   // Ao abrir o formulário, posiciona automaticamente o cursor
-  // no campo de busca por telefone.
-  const [clienteEncontrado, setClienteEncontrado] = React.useState<null | {
-    cliente: string;
-    telefone: string;
-    endereco: string;
+  // no campo de busca por phone.
+  const [customerEncontrado, setcustomerEncontrado] = React.useState<null | {
+    customer: string;
+    phone: string;
+    address: string;
   }>(null);
 
-  const inputTelefoneRef = React.useRef<HTMLInputElement>(null);
+  const inputphoneRef = React.useRef<HTMLInputElement>(null);
 
   // Estado principal da aplicação.
   // No futuro os chamados serão carregados da API,
@@ -34,67 +34,67 @@ export default function Page() {
   const [chamados, setChamados] = React.useState([
     {
       id: 1,
-      cliente: "João Silva",
-      telefone: "(11) 98765-4321",
-      endereco: "Rua das Flores, 123",
-      descricao: "Entupimento na pia da cozinha",
-      prioridade: "Alta",
-      valor: 150,
-      dataAbertura: "2024-06-01T10:00:00Z",
-      status: "Aberto",
+      customer: "João Silva",
+      phone: "(11) 98765-4321",
+      address: "Rua das Flores, 123",
+      description: "Entupimento na pia da cozinha",
+      priority: "Alta",
+      value: 150,
+      openedAt: "2024-06-01T10:00:00Z",
+      status: "Open",
     },
     {
       id: 2,
-      cliente: "Maria Santos",
-      telefone: "(11) 98854-5411",
-      endereco: "Rua das Árvores, 503",
-      descricao: "Entupimento no vaso sanitário",
-      prioridade: "Baixa",
-      valor: 300,
-      dataAbertura: "2024-06-01T10:00:00Z",
-      status: "Em andamento",
+      customer: "Maria Santos",
+      phone: "(11) 98854-5411",
+      address: "Rua das Árvores, 503",
+      description: "Entupimento no vaso sanitário",
+      priority: "Baixa",
+      value: 300,
+      openedAt: "2024-06-01T10:00:00Z",
+      status: "In Progress",
     },
     {
       id: 3,
-      cliente: "Carlos Oliveira",
-      telefone: "(11) 98745-3210",
-      endereco: "Rua das Pedras, 203",
-      descricao: "Entupimento de ralo",
-      prioridade: "Média",
-      valor: 450,
-      dataAbertura: "2024-06-01T10:00:00Z",
-      status: "Finalizado",
+      customer: "Carlos Oliveira",
+      phone: "(11) 98745-3210",
+      address: "Rua das Pedras, 203",
+      description: "Entupimento de ralo",
+      priority: "Média",
+      value: 450,
+      openedAt: "2024-06-01T10:00:00Z",
+      status: "Completed",
     },
   ]);
 
   // Métricas derivadas do estado principal.
   // Sempre que a lista de chamados muda,
   // os indicadores do dashboard são recalculados automaticamente.
-  const totalAbertos = chamados.filter(
-    (item) => item.status === "Aberto",
+  const totalOpen = chamados.filter(
+    (item) => item.status === "Open",
   ).length;
 
   const totalEmAndamento = chamados.filter(
-    (item) => item.status === "Em andamento",
+    (item) => item.status === "In Progress",
   ).length;
 
-  const totalFinalizados = chamados.filter(
-    (item) => item.status === "Finalizado",
+  const totalCompleted = chamados.filter(
+    (item) => item.status === "Completed",
   ).length;
 
   const chamadosFiltrados =
-    filtroStatus === "Todos"
+    filtroStatus === "All"
       ? chamados
       : chamados.filter((item) => item.status === filtroStatus);
 
   React.useEffect(() => {
-    if (novoChamadoAberto) {
-      inputTelefoneRef.current?.focus();
+    if (novoChamadoOpen) {
+      inputphoneRef.current?.focus();
     }
-  }, [novoChamadoAberto]);
+  }, [novoChamadoOpen]);
 
-  function formatarTelefone(valor: string) {
-    const numeros = valor.replace(/\D/g, "").slice(0, 11);
+  function formatarphone(value: string) {
+    const numeros = value.replace(/\D/g, "").slice(0, 11);
 
     if (numeros.length <= 2) {
       return numeros;
@@ -107,29 +107,29 @@ export default function Page() {
     return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
   }
 
-  // Busca clientes pelo telefone ignorando máscara,
+  // Busca customers pelo phone ignorando máscara,
   // espaços e caracteres especiais.
-  // O mesmo fluxo permite localizar clientes existentes
-  // ou iniciar o cadastro de um novo cliente.
-  function buscarCliente() {
-    const telefoneDigitado = telefoneBusca.replace(/\D/g, "");
+  // O mesmo fluxo permite localizar customers existentes
+  // ou iniciar o cadastro de um novo customer.
+  function buscarcustomer() {
+    const phoneDigitado = phoneBusca.replace(/\D/g, "");
 
     const chamadoEncontrado = chamados.find(
-      (item) => item.telefone.replace(/\D/g, "") === telefoneDigitado,
+      (item) => item.phone.replace(/\D/g, "") === phoneDigitado,
     );
 
     if (!chamadoEncontrado) {
-      setClienteEncontrado(null);
+      setcustomerEncontrado(null);
 
-      // Cliente não encontrado.
-      // Libera os campos para cadastro de um novo cliente
+      // customer não encontrado.
+      // Libera os campos para cadastro de um novo customer
       // junto com a abertura do chamado.
-      setClienteNovo(true);
-      setNomeCliente("");
-      setTelefoneCliente(telefoneBusca);
-      setEnderecoCliente("");
+      setcustomerNovo(true);
+      setNomecustomer("");
+      setphonecustomer(phoneBusca);
+      setaddresscustomer("");
 
-      setMensagemBusca("Cliente não encontrado");
+      setMensagemBusca("customer não encontrado");
 
       setTimeout(() => {
         setMensagemBusca("");
@@ -139,12 +139,12 @@ export default function Page() {
     }
 
     setMensagemBusca("");
-    setClienteNovo(false);
+    setcustomerNovo(false);
 
-    setClienteEncontrado({
-      cliente: chamadoEncontrado.cliente,
-      telefone: chamadoEncontrado.telefone,
-      endereco: chamadoEncontrado.endereco,
+    setcustomerEncontrado({
+      customer: chamadoEncontrado.customer,
+      phone: chamadoEncontrado.phone,
+      address: chamadoEncontrado.address,
     });
   }
 
@@ -153,48 +153,48 @@ export default function Page() {
   // a persistência ocorre apenas em memória.
   function salvarChamado() {
     if (
-      !nomeCliente ||
-      !telefoneCliente ||
-      !enderecoCliente ||
-      !descricaoProblema
+      !nomecustomer ||
+      !phonecustomer ||
+      !addresscustomer ||
+      !descriptionProblema
     ) {
       
-          alert("Preencha todos os campos obrigatórios");
+          alert("Preencha All os campos obrigatórios");
       return;
     }
 
     const novoChamado = {
       id: chamados.length + 1,
-      cliente: nomeCliente,
-      telefone: telefoneCliente,
-      endereco: enderecoCliente,
-      descricao: descricaoProblema,
-      prioridade: prioridade,
-      valor: 0,
-      dataAbertura: new Date().toISOString(),
-      status: "Aberto",
+      customer: nomecustomer,
+      phone: phonecustomer,
+      address: addresscustomer,
+      description: descriptionProblema,
+      priority: priority,
+      value: 0,
+      openedAt: new Date().toISOString(),
+      status: "Open",
     };
 
     setChamados([...chamados, novoChamado]);
 
-    setNomeCliente("");
-    setTelefoneCliente("");
-    setEnderecoCliente("");
-    setDescricaoProblema("");
-    setPrioridade("Média");
-    setTelefoneBusca("");
-    setClienteEncontrado(null);
+    setNomecustomer("");
+    setphonecustomer("");
+    setaddresscustomer("");
+    setdescriptionProblema("");
+    setpriority("Média");
+    setphoneBusca("");
+    setcustomerEncontrado(null);
     setMensagemBusca("");
-    setClienteNovo(false);
+    setcustomerNovo(false);
 
-    setNovoChamadoAberto(false);
+    setNovoChamadoOpen(false);
   }
 
   // Atualiza o status de um chamado específico.
   // Algumas mudanças de status possuem regras de negócio
   // que exigem atenção do atendente.
   // Regra de negócio:
-          // Quando um chamado retorna de "Em andamento" para "Aberto",
+          // Quando um chamado retorna de "In Progress" para "Open",
           // o atendente deve verificar o motivo e reatribuir o serviço.
   function alterarStatusChamado(id: number, novoStatus: string) {
     setChamados(
@@ -203,9 +203,9 @@ export default function Page() {
           return chamado;
         }
 
-        if (chamado.status === "Em andamento" && novoStatus === "Aberto") {
+        if (chamado.status === "In Progress" && novoStatus === "Open") {
           alert(
-            "Atenção: este chamado voltou de Em andamento para Aberto. Verifique com o prestador e reatribua o atendimento.",
+            "Atenção: este chamado voltou de In Progress para Open. Verifique com o prestador e reatribua o atendimento.",
           );
         }
 
@@ -241,19 +241,19 @@ export default function Page() {
           </p>
         </header>
 
-        {menuAtivo === "Chamados" && (
+        {menuAtivo === "Service Requests" && (
           <section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-2xl shadow p-4 border">
-                <p className="text-sm text-gray-500">📋 Abertos</p>
+                <p className="text-sm text-gray-500">📋 Open</p>
 
                 <h3 className="text-3xl font-bold text-red-600">
-                  {totalAbertos}
+                  {totalOpen}
                 </h3>
               </div>
 
               <div className="bg-white rounded-2xl shadow p-4 border">
-                <p className="text-sm text-gray-500">🚚 Em andamento</p>
+                <p className="text-sm text-gray-500">🚚 In Progress</p>
 
                 <h3 className="text-3xl font-bold text-yellow-600">
                   {totalEmAndamento}
@@ -261,33 +261,33 @@ export default function Page() {
               </div>
 
               <div className="bg-white rounded-2xl shadow p-4 border">
-                <p className="text-sm text-gray-500">✅ Finalizados</p>
+                <p className="text-sm text-gray-500">✅ Completed</p>
 
                 <h3 className="text-3xl font-bold text-green-600">
-                  {totalFinalizados}
+                  {totalCompleted}
                 </h3>
               </div>
             </div>
-            <FiltroStatus
-              filtroStatus={filtroStatus}
-              setFiltroStatus={setFiltroStatus}
+            <StatusFilter
+              statusFilter={filtroStatus}
+              setStatusFilter={setFiltroStatus}
             />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {chamadosFiltrados.map((item) => (
-                <CardChamado
+                <ServiceRequestCard
                   key={item.id}
                   id={item.id}
-                  cliente={item.cliente}
-                  telefone={item.telefone}
-                  endereco={item.endereco}
-                  descricao={item.descricao}
-                  prioridade={item.prioridade}
-                  valor={item.valor}
-                  dataAbertura={item.dataAbertura}
+                  customer={item.customer}
+                  phone={item.phone}
+                  address={item.address}
+                  description={item.description}
+                  priority={item.priority}
+                  value={item.value}
+                  openedAt={item.openedAt}
                   status={item.status}
-                  onAlterarStatus={alterarStatusChamado}
-                  onExcluir={excluirChamado}
+                  onStatusChange={alterarStatusChamado}
+                  onDelete={excluirChamado}
                 />
               ))}
             </div>
@@ -297,20 +297,20 @@ export default function Page() {
 
       <aside
         className={`fixed bottom-6 right-6 z-50 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl transition-all duration-300 ease-out ${
-          novoChamadoAberto ? "h-150 w-140 p-6" : "h-14 w-48 p-0"
+          novoChamadoOpen ? "h-150 w-140 p-6" : "h-14 w-48 p-0"
         }`}
       >
-        {!novoChamadoAberto && (
+        {!novoChamadoOpen && (
           <button
             type="button"
-            onClick={() => setNovoChamadoAberto(true)}
+            onClick={() => setNovoChamadoOpen(true)}
             className="h-full w-full rounded-3xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700"
           >
             + Novo Chamado
           </button>
         )}
 
-        {novoChamadoAberto && (
+        {novoChamadoOpen && (
           <form>
             <h3 className="mb-4 text-xl font-bold text-gray-900">
               Novo chamado
@@ -320,41 +320,41 @@ export default function Page() {
               <div className="relative">
                 <div className="flex gap-2">
                   <input
-                    ref={inputTelefoneRef}
-                    value={telefoneBusca}
+                    ref={inputphoneRef}
+                    value={phoneBusca}
                     onChange={(event) =>
-                      setTelefoneBusca(formatarTelefone(event.target.value))
+                      setphoneBusca(formatarphone(event.target.value))
                     }
                     className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                    placeholder="Telefone do cliente"
+                    placeholder="phone do customer"
                   />
 
                   <button
                     type="button"
-                    onClick={buscarCliente}
+                    onClick={buscarcustomer}
                     className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
                   >
                     Buscar
                   </button>
                 </div>
 
-                {clienteEncontrado && (
+                {customerEncontrado && (
                   <button
                     type="button"
                     onClick={() => {
-                      setNomeCliente(clienteEncontrado.cliente);
-                      setTelefoneCliente(clienteEncontrado.telefone);
-                      setEnderecoCliente(clienteEncontrado.endereco);
-                      setClienteEncontrado(null);
+                      setNomecustomer(customerEncontrado.customer);
+                      setphonecustomer(customerEncontrado.phone);
+                      setaddresscustomer(customerEncontrado.address);
+                      setcustomerEncontrado(null);
                     }}
                     className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
                   >
                     <div className="font-medium text-gray-900">
-                      👤 {clienteEncontrado.cliente}
+                      👤 {customerEncontrado.customer}
                     </div>
 
                     <div className="text-sm text-gray-500">
-                      📍 {clienteEncontrado.endereco}
+                      📍 {customerEncontrado.address}
                     </div>
                   </button>
                 )}
@@ -367,62 +367,62 @@ export default function Page() {
               </div>
 
               <input
-                value={nomeCliente}
-                onChange={(event) => setNomeCliente(event.target.value)}
-                readOnly={!clienteNovo && nomeCliente !== ""}
+                value={nomecustomer}
+                onChange={(event) => setNomecustomer(event.target.value)}
+                readOnly={!customerNovo && nomecustomer !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !clienteNovo && nomeCliente !== ""
+                  !customerNovo && nomecustomer !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Nome do cliente"
+                placeholder="Nome do customer"
               />
 
               <input
-                value={telefoneCliente}
-                onChange={(event) => setTelefoneCliente(event.target.value)}
-                readOnly={!clienteNovo && telefoneCliente !== ""}
+                value={phonecustomer}
+                onChange={(event) => setphonecustomer(event.target.value)}
+                readOnly={!customerNovo && phonecustomer !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !clienteNovo && telefoneCliente !== ""
+                  !customerNovo && phonecustomer !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Telefone do cliente"
+                placeholder="phone do customer"
               />
 
               <input
-                value={enderecoCliente}
-                onChange={(event) => setEnderecoCliente(event.target.value)}
-                readOnly={!clienteNovo && enderecoCliente !== ""}
+                value={addresscustomer}
+                onChange={(event) => setaddresscustomer(event.target.value)}
+                readOnly={!customerNovo && addresscustomer !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !clienteNovo && enderecoCliente !== ""
+                  !customerNovo && addresscustomer !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Endereço do cliente"
+                placeholder="address do customer"
               />
               <textarea
-                value={descricaoProblema}
-                onChange={(event) => setDescricaoProblema(event.target.value)}
+                value={descriptionProblema}
+                onChange={(event) => setdescriptionProblema(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
                 placeholder="Descrição do problema"
               />
 
               <select
-                value={prioridade}
-                onChange={(event) => setPrioridade(event.target.value)}
+                value={priority}
+                onChange={(event) => setpriority(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
               >
-                <option>Alta</option>
-                <option>Média</option>
-                <option>Baixa</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
               </select>
             </div>
 
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setNovoChamadoAberto(false)}
+                onClick={() => setNovoChamadoOpen(false)}
                 className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300"
               >
                 Cancelar

@@ -4,7 +4,7 @@ type SidebarProps = {
 }
 
 export default function Sidebar({ menuAtivo, setMenuAtivo }: SidebarProps) {
-  const menus = ["Chamados", "Clientes", "Relatórios", "Configurações"]
+  const menus = ["Service Requests", "Customers", "Reports", "Settings"]
 
   return (
     <aside className="w-64 bg-gray-900 text-white p-4">
