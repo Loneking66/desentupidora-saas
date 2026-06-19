@@ -2,21 +2,26 @@
 
 import React from "react";
 import Sidebar from "@/components/Sidebar";
-import StatusFilter from "@/components/StatusFilter";
 import ServiceRequestCard from "@/components/ServiceRequestCard";
+import { STATUS } from "@/constants/status";
+import StatusFilter from "@/components/StatusFilter";
+
+type StatusValue = typeof STATUS[keyof typeof STATUS]
 
 export default function Page() {
+  const [statusFilter, setStatusFilter] =
+    React.useState<StatusValue>(STATUS.All);
   const [ activeMenu, setActiveMenu] = React.useState("Service Requests");
-  const [statusFilter, setStatusFilter] = React.useState("All");
   const [newServiceRequestOpen, setNewServiceRequestOpen] = React.useState(false);
   const [phoneSearch, setPhoneSearch] = React.useState("");
-  const [customername, setCustomerName] = React.useState("");
+  const [customerName, setCustomerName] = React.useState("");
   const [customerNew, setCustomerNew] = React.useState(false);
   const [messageSearch, setMessageSearch] = React.useState("");
   const [customerPhone, setCustomerPhone] = React.useState("");
   const [customerAddress, setCustomerAddress] = React.useState("");
   const [problemDescription, setProblemDescription] = React.useState("");
   const [priority, setPriority] = React.useState("Medium");
+
   // Improves user experience by automatically focusing the phone input
   // when the new service request form is opened. This allows the operator
   // to start typing the customer's phone number immediately without needing
@@ -86,7 +91,7 @@ export default function Page() {
   ).length;
 
   const filteredServiceRequests =
-    statusFilter === "All"
+    statusFilter === STATUS.All
       ? serviceRequests
       : serviceRequests.filter((item) => item.status === statusFilter);
 
@@ -96,7 +101,7 @@ export default function Page() {
     }
   }, [newServiceRequestOpen]);
 
-  function formatarphone(value: string) {
+  function formatphone(value: string) {
     const phoneNumbers = value.replace(/\D/g, "").slice(0, 11);
 
     if (phoneNumbers.length <= 2) {
@@ -150,7 +155,7 @@ export default function Page() {
   // Creates a new service request based on the information entered in the form.
   function saveServiceRequest() {
     if (
-      !customername ||
+      !customerName ||
       !customerPhone ||
       !customerAddress ||
       !problemDescription
@@ -162,7 +167,7 @@ export default function Page() {
 
     const newServiceRequest = {
       id: serviceRequests.length + 1,
-      customer: customername,
+      customer: customerName,
       phone: customerPhone,
       address: customerAddress,
       description: problemDescription,
@@ -203,7 +208,8 @@ export default function Page() {
           return serviceRequest;
         }
 
-        if (serviceRequest.status === "In Progress" && newStatus === "Open") {
+        if (serviceRequest.status === STATUS.IN_PROGRESS && newStatus === STATUS.OPEN
+) {
           alert(
             "Attention: This service request is going back to Open. Please check with the service provider and reassign if necessary.",
           );
@@ -225,7 +231,7 @@ export default function Page() {
       return;
     }
 
-    setServiceRequests(serviceRequests.filter((serviceRequests) => serviceRequests.id !== id));
+    setServiceRequests(serviceRequests.filter((serviceRequest) => serviceRequest.id !== id));
   }
 
   return (
@@ -268,7 +274,7 @@ export default function Page() {
                 </h3>
               </div>
             </div>
-            <StatusFilter
+        <StatusFilter
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
             />
@@ -323,7 +329,7 @@ export default function Page() {
                     ref={inputphoneRef}
                     value={phoneSearch}
                     onChange={(event) =>
-                      setPhoneSearch(formatarphone(event.target.value))
+                      setPhoneSearch(formatphone(event.target.value))
                     }
                     className="w-full rounded-lg border border-gray-300 px-3 py-2"
                     placeholder="Customers phone"
@@ -367,11 +373,11 @@ export default function Page() {
               </div>
 
               <input
-                value={customername}
+                value={customerName}
                 onChange={(event) => setCustomerName(event.target.value)}
-                readOnly={!customerNew && customername !== ""}
+                readOnly={!customerNew && customerName !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !customerNew && customername !== ""
+                  !customerNew && customerName !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}

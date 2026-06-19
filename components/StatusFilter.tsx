@@ -1,14 +1,22 @@
+import { STATUS } from "@/constants/status"
+
+type StatusValue = typeof STATUS[keyof typeof STATUS]
+
 type StatusFilterProps = {
-  statusFilter: string
-  setStatusFilter: (status: string) => void
+  statusFilter: StatusValue
+  setStatusFilter: (status: StatusValue) => void
 }
 
 export default function StatusFilter({
   statusFilter,
   setStatusFilter,
 }: StatusFilterProps) {
-  const statuses = ["All", "Open", "In Progress", "Completed"]
-
+  const statuses: StatusValue[] = [
+    STATUS.All,
+    STATUS.OPEN,
+    STATUS.IN_PROGRESS,
+    STATUS.COMPLETED,
+  ]
   return (
     <div className="flex gap-2 mb-4">
       {statuses.map((item) => (

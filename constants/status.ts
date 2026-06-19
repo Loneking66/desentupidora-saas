@@ -1,5 +1,6 @@
 export const STATUS = {
+  All: "All",
   OPEN: "Open",
   IN_PROGRESS: "In Progress",
-  CLOSED: "Closed"
+  COMPLETED: "Completed",
 } as const;

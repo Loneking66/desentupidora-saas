@@ -3,7 +3,7 @@ type SidebarProps = {
   setActiveMenu: (menu: string) => void
 }
 
-export default function Sidebar({ activeMenu: menuAtivo, setActiveMenu: setMenuAtivo }: SidebarProps) {
+export default function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
   const menus = ["Service Requests", "Customers", "Reports", "Settings"]
 
   return (
@@ -16,9 +16,9 @@ export default function Sidebar({ activeMenu: menuAtivo, setActiveMenu: setMenuA
         {menus.map((menu) => (
           <div
             key={menu}
-            onClick={() => setMenuAtivo(menu)}
+            onClick={() => setActiveMenu(menu)}
             className={`p-3 rounded-lg cursor-pointer ${
-              menuAtivo === menu
+              activeMenu === menu
                 ? "bg-blue-600"
                 : "hover:bg-gray-800"
             }`}
