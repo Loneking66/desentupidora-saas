@@ -1,9 +1,9 @@
 type SidebarProps = {
-  menuAtivo: string
-  setMenuAtivo: (menu: string) => void
+  activeMenu: string
+  setActiveMenu: (menu: string) => void
 }
 
-export default function Sidebar({ menuAtivo, setMenuAtivo }: SidebarProps) {
+export default function Sidebar({ activeMenu: menuAtivo, setActiveMenu: setMenuAtivo }: SidebarProps) {
   const menus = ["Service Requests", "Customers", "Reports", "Settings"]
 
   return (

@@ -6,21 +6,22 @@ import StatusFilter from "@/components/StatusFilter";
 import ServiceRequestCard from "@/components/ServiceRequestCard";
 
 export default function Page() {
-  const [menuAtivo, setMenuAtivo] = React.useState("Service Requests");
-  const [filtroStatus, setFiltroStatus] = React.useState("All");
-  const [novoChamadoOpen, setNovoChamadoOpen] = React.useState(false);
-  const [phoneBusca, setphoneBusca] = React.useState("");
-  const [nomecustomer, setNomecustomer] = React.useState("");
-  const [customerNovo, setcustomerNovo] = React.useState(false);
-  const [mensagemBusca, setMensagemBusca] = React.useState("");
-  const [phonecustomer, setphonecustomer] = React.useState("");
-  const [addresscustomer, setaddresscustomer] = React.useState("");
-  const [descriptionProblema, setdescriptionProblema] = React.useState("");
-  const [priority, setpriority] = React.useState("Média");
-  // Melhora a experiência do operador.
-  // Ao abrir o formulário, posiciona automaticamente o cursor
-  // no campo de busca por phone.
-  const [customerEncontrado, setcustomerEncontrado] = React.useState<null | {
+  const [ activeMenu, setActiveMenu] = React.useState("Service Requests");
+  const [statusFilter, setStatusFilter] = React.useState("All");
+  const [newServiceRequestOpen, setNewServiceRequestOpen] = React.useState(false);
+  const [phoneSearch, setPhoneSearch] = React.useState("");
+  const [customername, setCustomerName] = React.useState("");
+  const [customerNew, setCustomerNew] = React.useState(false);
+  const [messageSearch, setMessageSearch] = React.useState("");
+  const [customerPhone, setCustomerPhone] = React.useState("");
+  const [customerAddress, setCustomerAddress] = React.useState("");
+  const [problemDescription, setProblemDescription] = React.useState("");
+  const [priority, setPriority] = React.useState("Medium");
+  // Improves user experience by automatically focusing the phone input
+  // when the new service request form is opened. This allows the operator
+  // to start typing the customer's phone number immediately without needing
+  // to click on the input field first.
+  const [customerFound, setCustomerFound] = React.useState<null | {
     customer: string;
     phone: string;
     address: string;
@@ -28,17 +29,18 @@ export default function Page() {
 
   const inputphoneRef = React.useRef<HTMLInputElement>(null);
 
-  // Estado principal da aplicação.
-  // No futuro os chamados serão carregados da API,
-  // mas atualmente permanecem apenas em memória no frontend.
-  const [chamados, setChamados] = React.useState([
+  // Main State of the application. All service requests are stored here.
+  // In a real application, this data would likely come from an API
+  // and be persisted in a database. For this example, we are using in-memory state 
+  // to keep things simple.
+  const [serviceRequests, setServiceRequests] = React.useState([
     {
       id: 1,
       customer: "João Silva",
       phone: "(11) 98765-4321",
       address: "Rua das Flores, 123",
       description: "Entupimento na pia da cozinha",
-      priority: "Alta",
+      priority: "High",
       value: 150,
       openedAt: "2024-06-01T10:00:00Z",
       status: "Open",
@@ -49,7 +51,7 @@ export default function Page() {
       phone: "(11) 98854-5411",
       address: "Rua das Árvores, 503",
       description: "Entupimento no vaso sanitário",
-      priority: "Baixa",
+      priority: "Low",
       value: 300,
       openedAt: "2024-06-01T10:00:00Z",
       status: "In Progress",
@@ -60,188 +62,186 @@ export default function Page() {
       phone: "(11) 98745-3210",
       address: "Rua das Pedras, 203",
       description: "Entupimento de ralo",
-      priority: "Média",
+      priority: "Medium",
       value: 450,
       openedAt: "2024-06-01T10:00:00Z",
       status: "Completed",
     },
   ]);
 
-  // Métricas derivadas do estado principal.
-  // Sempre que a lista de chamados muda,
-  // os indicadores do dashboard são recalculados automaticamente.
-  const totalOpen = chamados.filter(
+  // Dashboard indicators are calculated based on the current list of service requests.
+  // Every time the serviceRequests state changes, these indicators will be recalculated
+  // to reflect the current status of all service requests. This ensures that the dashboard
+  // always shows up-to-date information without needing manual refreshes.
+  const totalOpen = serviceRequests.filter(
     (item) => item.status === "Open",
   ).length;
 
-  const totalEmAndamento = chamados.filter(
+  const totalInProgress = serviceRequests.filter(
     (item) => item.status === "In Progress",
   ).length;
 
-  const totalCompleted = chamados.filter(
+  const totalCompleted = serviceRequests.filter(
     (item) => item.status === "Completed",
   ).length;
 
-  const chamadosFiltrados =
-    filtroStatus === "All"
-      ? chamados
-      : chamados.filter((item) => item.status === filtroStatus);
+  const filteredServiceRequests =
+    statusFilter === "All"
+      ? serviceRequests
+      : serviceRequests.filter((item) => item.status === statusFilter);
 
   React.useEffect(() => {
-    if (novoChamadoOpen) {
+    if (newServiceRequestOpen) {
       inputphoneRef.current?.focus();
     }
-  }, [novoChamadoOpen]);
+  }, [newServiceRequestOpen]);
 
   function formatarphone(value: string) {
-    const numeros = value.replace(/\D/g, "").slice(0, 11);
+    const phoneNumbers = value.replace(/\D/g, "").slice(0, 11);
 
-    if (numeros.length <= 2) {
-      return numeros;
+    if (phoneNumbers.length <= 2) {
+      return phoneNumbers;
     }
 
-    if (numeros.length <= 7) {
-      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+    if (phoneNumbers.length <= 7) {
+      return `(${phoneNumbers.slice(0, 2)}) ${phoneNumbers.slice(2)}`;
     }
 
-    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+    return `(${phoneNumbers.slice(0, 2)}) ${phoneNumbers.slice(2, 7)}-${phoneNumbers.slice(7)}`;
   }
 
-  // Busca customers pelo phone ignorando máscara,
-  // espaços e caracteres especiais.
-  // O mesmo fluxo permite localizar customers existentes
-  // ou iniciar o cadastro de um novo customer.
-  function buscarcustomer() {
-    const phoneDigitado = phoneBusca.replace(/\D/g, "");
+  // Searches for an existing customer
+  // based on the phone number entered by the operator.
+  function searchcustomer() {
+    const enteredPhone = phoneSearch.replace(/\D/g, "");
 
-    const chamadoEncontrado = chamados.find(
-      (item) => item.phone.replace(/\D/g, "") === phoneDigitado,
+    const serviceRequestFound = serviceRequests.find(
+      (item) => item.phone.replace(/\D/g, "") === enteredPhone,
     );
 
-    if (!chamadoEncontrado) {
-      setcustomerEncontrado(null);
+    if (!serviceRequestFound) {
+      setCustomerFound(null);
 
-      // customer não encontrado.
-      // Libera os campos para cadastro de um novo customer
-      // junto com a abertura do chamado.
-      setcustomerNovo(true);
-      setNomecustomer("");
-      setphonecustomer(phoneBusca);
-      setaddresscustomer("");
+      // Customer not found. The operator can choose to create 
+      // a new customer with the entered phone number.
+      setCustomerNew(true);
+      setCustomerName("");
+      setCustomerPhone(phoneSearch);
+      setCustomerAddress("");
 
-      setMensagemBusca("customer não encontrado");
+      setMessageSearch("Customer Not Found. Fill in the details to create a new customer.");
 
       setTimeout(() => {
-        setMensagemBusca("");
+        setMessageSearch("");
       }, 3000);
 
       return;
     }
 
-    setMensagemBusca("");
-    setcustomerNovo(false);
-
-    setcustomerEncontrado({
-      customer: chamadoEncontrado.customer,
-      phone: chamadoEncontrado.phone,
-      address: chamadoEncontrado.address,
+    setMessageSearch("");
+    setCustomerNew(false);
+    setCustomerFound({
+      customer: serviceRequestFound.customer,
+      phone: serviceRequestFound.phone,
+      address: serviceRequestFound.address,
     });
   }
 
-  // Cria um novo chamado utilizando os dados preenchidos
-  // pelo operador. Enquanto não existe backend,
-  // a persistência ocorre apenas em memória.
-  function salvarChamado() {
+  // Creates a new service request based on the information entered in the form.
+  function saveServiceRequest() {
     if (
-      !nomecustomer ||
-      !phonecustomer ||
-      !addresscustomer ||
-      !descriptionProblema
+      !customername ||
+      !customerPhone ||
+      !customerAddress ||
+      !problemDescription
     ) {
       
-          alert("Preencha All os campos obrigatórios");
+          alert("Fill in all fields to create a new service request.");
       return;
     }
 
-    const novoChamado = {
-      id: chamados.length + 1,
-      customer: nomecustomer,
-      phone: phonecustomer,
-      address: addresscustomer,
-      description: descriptionProblema,
+    const newServiceRequest = {
+      id: serviceRequests.length + 1,
+      customer: customername,
+      phone: customerPhone,
+      address: customerAddress,
+      description: problemDescription,
       priority: priority,
       value: 0,
       openedAt: new Date().toISOString(),
       status: "Open",
     };
 
-    setChamados([...chamados, novoChamado]);
+    setServiceRequests([...serviceRequests, newServiceRequest]);
 
-    setNomecustomer("");
-    setphonecustomer("");
-    setaddresscustomer("");
-    setdescriptionProblema("");
-    setpriority("Média");
-    setphoneBusca("");
-    setcustomerEncontrado(null);
-    setMensagemBusca("");
-    setcustomerNovo(false);
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerAddress("");
+    setProblemDescription("");
+    setPriority("Medium");
+    setPhoneSearch("");
+    setCustomerFound(null);
+    setMessageSearch("");
+    setCustomerNew(false);
 
-    setNovoChamadoOpen(false);
+    setNewServiceRequestOpen(false);
   }
 
-  // Atualiza o status de um chamado específico.
-  // Algumas mudanças de status possuem regras de negócio
-  // que exigem atenção do atendente.
-  // Regra de negócio:
-          // Quando um chamado retorna de "In Progress" para "Open",
-          // o atendente deve verificar o motivo e reatribuir o serviço.
-  function alterarStatusChamado(id: number, novoStatus: string) {
-    setChamados(
-      chamados.map((chamado) => {
-        if (chamado.id !== id) {
-          return chamado;
+  // Refreshes the status of a service request when the operator changes it.
+  // Some business rules are applied when changing the status to ensure that the operator
+  // is aware of important transitions and can take necessary actions. 
+      // For example, if a service request goes back from "In Progress" to "Open", 
+      // the operator is alerted to check with the service provider and reassign 
+      // the service if needed. 
+      // This helps maintain the quality of service and ensures that
+      //  no service request is left unattended due to status changes.  
+          
+  function changeServiceRequestStatus(id: number, newStatus: string) {
+    setServiceRequests(
+      serviceRequests.map((serviceRequest) => {
+        if (serviceRequest.id !== id) {
+          return serviceRequest;
         }
 
-        if (chamado.status === "In Progress" && novoStatus === "Open") {
+        if (serviceRequest.status === "In Progress" && newStatus === "Open") {
           alert(
-            "Atenção: este chamado voltou de In Progress para Open. Verifique com o prestador e reatribua o atendimento.",
+            "Attention: This service request is going back to Open. Please check with the service provider and reassign if necessary.",
           );
         }
 
         return {
-          ...chamado,
-          status: novoStatus,
+          ...serviceRequest,
+          status: newStatus,
         };
       }),
     );
   }
 
-  // Remove um chamado da lista após confirmação do operador.
-  function excluirChamado(id: number) {
-    const confirmar = confirm("Tem certeza que deseja excluir este chamado?");
+  // Removes a service request from the list when the operator chooses to delete it.
+  function deleteServiceRequest(id: number) {
+    const confirm = window.confirm("Are you sure you want to delete this service request?");
 
-    if (!confirmar) {
+    if (!confirm) {
       return;
     }
 
-    setChamados(chamados.filter((chamado) => chamado.id !== id));
+    setServiceRequests(serviceRequests.filter((serviceRequests) => serviceRequests.id !== id));
   }
 
   return (
     <div className="flex h-screen">
-      <Sidebar menuAtivo={menuAtivo} setMenuAtivo={setMenuAtivo} />
+      <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
       <main className="flex-1 bg-gray-100 p-6">
         <header className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{menuAtivo}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{ activeMenu}</h2>
 
           <p className="text-gray-500">
-            Visão geral dos chamados da desentupidora
+            Manage service requests, customers, reports, and settings from one operational dashboard.
           </p>
         </header>
 
-        {menuAtivo === "Service Requests" && (
+        { activeMenu === "Service Requests" && (
           <section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-2xl shadow p-4 border">
@@ -256,7 +256,7 @@ export default function Page() {
                 <p className="text-sm text-gray-500">🚚 In Progress</p>
 
                 <h3 className="text-3xl font-bold text-yellow-600">
-                  {totalEmAndamento}
+                  {totalInProgress}
                 </h3>
               </div>
 
@@ -269,12 +269,12 @@ export default function Page() {
               </div>
             </div>
             <StatusFilter
-              statusFilter={filtroStatus}
-              setStatusFilter={setFiltroStatus}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
             />
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {chamadosFiltrados.map((item) => (
+              {filteredServiceRequests.map((item) => (
                 <ServiceRequestCard
                   key={item.id}
                   id={item.id}
@@ -286,8 +286,8 @@ export default function Page() {
                   value={item.value}
                   openedAt={item.openedAt}
                   status={item.status}
-                  onStatusChange={alterarStatusChamado}
-                  onDelete={excluirChamado}
+                  onStatusChange={changeServiceRequestStatus}
+                  onDelete={deleteServiceRequest}
                 />
               ))}
             </div>
@@ -297,23 +297,23 @@ export default function Page() {
 
       <aside
         className={`fixed bottom-6 right-6 z-50 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl transition-all duration-300 ease-out ${
-          novoChamadoOpen ? "h-150 w-140 p-6" : "h-14 w-48 p-0"
+          newServiceRequestOpen ? "h-150 w-140 p-6" : "h-14 w-48 p-0"
         }`}
       >
-        {!novoChamadoOpen && (
+        {!newServiceRequestOpen && (
           <button
             type="button"
-            onClick={() => setNovoChamadoOpen(true)}
+            onClick={() => setNewServiceRequestOpen(true)}
             className="h-full w-full rounded-3xl bg-blue-600 font-semibold text-white transition hover:bg-blue-700"
           >
-            + Novo Chamado
+            + New Service Request
           </button>
         )}
 
-        {novoChamadoOpen && (
+        {newServiceRequestOpen && (
           <form>
             <h3 className="mb-4 text-xl font-bold text-gray-900">
-              Novo chamado
+              New Service Request
             </h3>
 
             <div className="space-y-3">
@@ -321,96 +321,99 @@ export default function Page() {
                 <div className="flex gap-2">
                   <input
                     ref={inputphoneRef}
-                    value={phoneBusca}
+                    value={phoneSearch}
                     onChange={(event) =>
-                      setphoneBusca(formatarphone(event.target.value))
+                      setPhoneSearch(formatarphone(event.target.value))
                     }
                     className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                    placeholder="phone do customer"
+                    placeholder="Customers phone"
                   />
 
                   <button
                     type="button"
-                    onClick={buscarcustomer}
+                    onClick={searchcustomer}
                     className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
                   >
-                    Buscar
+                    Search
                   </button>
                 </div>
 
-                {customerEncontrado && (
+                {customerFound && (
                   <button
                     type="button"
                     onClick={() => {
-                      setNomecustomer(customerEncontrado.customer);
-                      setphonecustomer(customerEncontrado.phone);
-                      setaddresscustomer(customerEncontrado.address);
-                      setcustomerEncontrado(null);
+                      setCustomerName(customerFound.customer);
+                      setCustomerPhone(customerFound.phone);
+                      setCustomerAddress(customerFound.address);
+                      setCustomerFound(null);
                     }}
                     className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
                   >
                     <div className="font-medium text-gray-900">
-                      👤 {customerEncontrado.customer}
+                      👤 {customerFound.customer}
                     </div>
 
                     <div className="text-sm text-gray-500">
-                      📍 {customerEncontrado.address}
+                      📍 {customerFound.address}
                     </div>
                   </button>
                 )}
 
-                {mensagemBusca && (
+                {messageSearch && (
                   <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 shadow-lg">
-                    {mensagemBusca}
+                    {messageSearch}
                   </div>
                 )}
               </div>
 
               <input
-                value={nomecustomer}
-                onChange={(event) => setNomecustomer(event.target.value)}
-                readOnly={!customerNovo && nomecustomer !== ""}
+                value={customername}
+                onChange={(event) => setCustomerName(event.target.value)}
+                readOnly={!customerNew && customername !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !customerNovo && nomecustomer !== ""
+                  !customerNew && customername !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Nome do customer"
+                placeholder="Customer's name"
               />
 
               <input
-                value={phonecustomer}
-                onChange={(event) => setphonecustomer(event.target.value)}
-                readOnly={!customerNovo && phonecustomer !== ""}
+                value={customerPhone}
+                onChange={(event) => setCustomerPhone(event.target.value)}
+                readOnly={!customerNew && customerPhone !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !customerNovo && phonecustomer !== ""
+                  !customerNew && customerPhone !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="phone do customer"
+                placeholder="Customer's phone"
               />
 
               <input
-                value={addresscustomer}
-                onChange={(event) => setaddresscustomer(event.target.value)}
-                readOnly={!customerNovo && addresscustomer !== ""}
+                value={customerAddress}
+                onChange={(event) => setCustomerAddress(event.target.value)}
+                readOnly={!customerNew && customerAddress !== ""}
                 className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
-                  !customerNovo && addresscustomer !== ""
+                  !customerNew && customerAddress !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="address do customer"
+                placeholder="Customer's address"
               />
               <textarea
-                value={descriptionProblema}
-                onChange={(event) => setdescriptionProblema(event.target.value)}
+                value={problemDescription}
+                onChange={(event) => setProblemDescription(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                placeholder="Descrição do problema"
+                placeholder="Problem description"
               />
 
+              <h3 className="mb-1 text-xl font-bold text-gray-900">
+              Priority
+            </h3>
               <select
                 value={priority}
-                onChange={(event) => setpriority(event.target.value)}
+                onChange={(event) => setPriority(event.target.value)}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2"
               >
                 <option>High</option>
@@ -422,18 +425,18 @@ export default function Page() {
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setNovoChamadoOpen(false)}
+                onClick={() => setNewServiceRequestOpen(false)}
                 className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300"
               >
-                Cancelar
+                Cancel
               </button>
 
               <button
                 type="button"
-                onClick={salvarChamado}
+                onClick={saveServiceRequest}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
-                Salvar
+                Save
               </button>
             </div>
           </form>
