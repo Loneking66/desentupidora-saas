@@ -17,6 +17,7 @@ interface ServiceRequestCardProps {
   value: number;
   openedAt: string;
   status: string;
+  technician: string;
 
   onStatusChange: (
     id: number,
@@ -35,6 +36,7 @@ export default function ServiceRequestCard({
   value,
   openedAt,
   status,
+  technician,
   onStatusChange,
   onDelete,
 }: ServiceRequestCardProps) {
@@ -58,22 +60,34 @@ return (
   onChange={(event) =>
     onStatusChange(id, event.target.value)
   }
-  className={`mt-2 w-full rounded-lg border px-2 py-1 font-semibold ${statusColor(status)}`}
->
+className={`mt-2 w-full sm:w-56 rounded-lg border px-2 py-1 font-semibold ${statusColor(status)}`}>
   <option>Open</option>
   <option>In Progress</option>
   <option>Completed</option>
 </select>
     </div>
 
+
     <div className="space-y-2 text-sm text-gray-700">
       <p>📞 {phone}</p>
       <p>📍 {address}</p>
       <p>🔧 {description}</p>
     </div>
+    
+<div className="border-t border-gray-200 pt-4 mt-4">
+  <div className="flex items-start gap-3">
+    <span>👷‍♂️</span>
+
+    <div>
+      <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
+        {technician}
+  </span>
+    </div>
+  </div>
+</div>
 
     <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-      <span className="text-sm font-medium">
+      <span className="text-sm font-medium text-gray-900">
         ⚠️ {priority}
       </span>
 

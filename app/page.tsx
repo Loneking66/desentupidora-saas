@@ -1,18 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import ServiceRequestCard from "@/components/ServiceRequestCard";
 import { STATUS } from "@/constants/status";
 import StatusFilter from "@/components/StatusFilter";
+import TechnicianFilter from "@/components/technicianFilter";
+import { ALL_TECHNICIANS, TECHNICIANS } from "@/constants/technicians";
 
-type StatusValue = typeof STATUS[keyof typeof STATUS]
+type StatusValue = (typeof STATUS)[keyof typeof STATUS];
 
 export default function Page() {
-  const [statusFilter, setStatusFilter] =
-    React.useState<StatusValue>(STATUS.All);
-  const [ activeMenu, setActiveMenu] = React.useState("Service Requests");
-  const [newServiceRequestOpen, setNewServiceRequestOpen] = React.useState(false);
+  const [statusFilter, setStatusFilter] = React.useState<StatusValue>(
+    STATUS.All,
+  );
+  const [activeMenu, setActiveMenu] = React.useState("Service Requests");
+  const [newServiceRequestOpen, setNewServiceRequestOpen] =
+    React.useState(false);
   const [phoneSearch, setPhoneSearch] = React.useState("");
   const [customerName, setCustomerName] = React.useState("");
   const [customerNew, setCustomerNew] = React.useState(false);
@@ -21,6 +25,10 @@ export default function Page() {
   const [customerAddress, setCustomerAddress] = React.useState("");
   const [problemDescription, setProblemDescription] = React.useState("");
   const [priority, setPriority] = React.useState("Medium");
+  const [technicianFilter, setTechnicianFilter] =
+    useState<string>(ALL_TECHNICIANS);
+  const [assignedTechnician, setAssignedTechnician] =
+    React.useState<Technician>(TECHNICIANS[0]);
 
   // Improves user experience by automatically focusing the phone input
   // when the new service request form is opened. This allows the operator
@@ -36,7 +44,7 @@ export default function Page() {
 
   // Main State of the application. All service requests are stored here.
   // In a real application, this data would likely come from an API
-  // and be persisted in a database. For this example, we are using in-memory state 
+  // and be persisted in a database. For this example, we are using in-memory state
   // to keep things simple.
   const [serviceRequests, setServiceRequests] = React.useState([
     {
@@ -49,6 +57,7 @@ export default function Page() {
       value: 150,
       openedAt: "2024-06-01T10:00:00Z",
       status: "Open",
+      technician: "Carlos Oliveira",
     },
     {
       id: 2,
@@ -60,6 +69,7 @@ export default function Page() {
       value: 300,
       openedAt: "2024-06-01T10:00:00Z",
       status: "In Progress",
+      technician: "João Pedro",
     },
     {
       id: 3,
@@ -71,6 +81,7 @@ export default function Page() {
       value: 450,
       openedAt: "2024-06-01T10:00:00Z",
       status: "Completed",
+      technician: "Marcos Vinicius",
     },
   ]);
 
@@ -90,10 +101,16 @@ export default function Page() {
     (item) => item.status === "Completed",
   ).length;
 
-  const filteredServiceRequests =
-    statusFilter === STATUS.All
-      ? serviceRequests
-      : serviceRequests.filter((item) => item.status === statusFilter);
+  const filteredServiceRequests = serviceRequests.filter((serviceRequest) => {
+    const matchesStatus =
+      statusFilter === "All" || serviceRequest.status === statusFilter;
+
+    const matchesTechnician =
+      technicianFilter === ALL_TECHNICIANS ||
+      serviceRequest.technician === technicianFilter;
+
+    return matchesStatus && matchesTechnician;
+  });
 
   React.useEffect(() => {
     if (newServiceRequestOpen) {
@@ -101,7 +118,7 @@ export default function Page() {
     }
   }, [newServiceRequestOpen]);
 
-  function formatphone(value: string) {
+  function formatPhone(value: string) {
     const phoneNumbers = value.replace(/\D/g, "").slice(0, 11);
 
     if (phoneNumbers.length <= 2) {
@@ -117,7 +134,7 @@ export default function Page() {
 
   // Searches for an existing customer
   // based on the phone number entered by the operator.
-  function searchcustomer() {
+  function searchCustomer() {
     const enteredPhone = phoneSearch.replace(/\D/g, "");
 
     const serviceRequestFound = serviceRequests.find(
@@ -127,14 +144,16 @@ export default function Page() {
     if (!serviceRequestFound) {
       setCustomerFound(null);
 
-      // Customer not found. The operator can choose to create 
+      // Customer not found. The operator can choose to create
       // a new customer with the entered phone number.
       setCustomerNew(true);
       setCustomerName("");
       setCustomerPhone(phoneSearch);
       setCustomerAddress("");
 
-      setMessageSearch("Customer Not Found. Fill in the details to create a new customer.");
+      setMessageSearch(
+        "Customer Not Found. Fill in the details to create a new customer.",
+      );
 
       setTimeout(() => {
         setMessageSearch("");
@@ -160,8 +179,7 @@ export default function Page() {
       !customerAddress ||
       !problemDescription
     ) {
-      
-          alert("Fill in all fields to create a new service request.");
+      alert("Fill in all fields to create a new service request.");
       return;
     }
 
@@ -175,6 +193,7 @@ export default function Page() {
       value: 0,
       openedAt: new Date().toISOString(),
       status: "Open",
+      technician: assignedTechnician,
     };
 
     setServiceRequests([...serviceRequests, newServiceRequest]);
@@ -194,13 +213,13 @@ export default function Page() {
 
   // Refreshes the status of a service request when the operator changes it.
   // Some business rules are applied when changing the status to ensure that the operator
-  // is aware of important transitions and can take necessary actions. 
-      // For example, if a service request goes back from "In Progress" to "Open", 
-      // the operator is alerted to check with the service provider and reassign 
-      // the service if needed. 
-      // This helps maintain the quality of service and ensures that
-      //  no service request is left unattended due to status changes.  
-          
+  // is aware of important transitions and can take necessary actions.
+  // For example, if a service request goes back from "In Progress" to "Open",
+  // the operator is alerted to check with the service provider and reassign
+  // the service if needed.
+  // This helps maintain the quality of service and ensures that
+  //  no service request is left unattended due to status changes.
+
   function changeServiceRequestStatus(id: number, newStatus: string) {
     setServiceRequests(
       serviceRequests.map((serviceRequest) => {
@@ -208,8 +227,10 @@ export default function Page() {
           return serviceRequest;
         }
 
-        if (serviceRequest.status === STATUS.IN_PROGRESS && newStatus === STATUS.OPEN
-) {
+        if (
+          serviceRequest.status === STATUS.IN_PROGRESS &&
+          newStatus === STATUS.OPEN
+        ) {
           alert(
             "Attention: This service request is going back to Open. Please check with the service provider and reassign if necessary.",
           );
@@ -225,13 +246,17 @@ export default function Page() {
 
   // Removes a service request from the list when the operator chooses to delete it.
   function deleteServiceRequest(id: number) {
-    const confirm = window.confirm("Are you sure you want to delete this service request?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this service request?",
+    );
 
     if (!confirm) {
       return;
     }
 
-    setServiceRequests(serviceRequests.filter((serviceRequest) => serviceRequest.id !== id));
+    setServiceRequests(
+      serviceRequests.filter((serviceRequest) => serviceRequest.id !== id),
+    );
   }
 
   return (
@@ -240,22 +265,21 @@ export default function Page() {
 
       <main className="flex-1 bg-gray-100 p-6">
         <header className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">{ activeMenu}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">{activeMenu}</h2>
 
           <p className="text-gray-500">
-            Manage service requests, customers, reports, and settings from one operational dashboard.
+            Manage service requests, customers, reports, and settings from one
+            operational dashboard.
           </p>
         </header>
 
-        { activeMenu === "Service Requests" && (
+        {activeMenu === "Service Requests" && (
           <section>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-2xl shadow p-4 border">
                 <p className="text-sm text-gray-500">📋 Open</p>
 
-                <h3 className="text-3xl font-bold text-red-600">
-                  {totalOpen}
-                </h3>
+                <h3 className="text-3xl font-bold text-red-600">{totalOpen}</h3>
               </div>
 
               <div className="bg-white rounded-2xl shadow p-4 border">
@@ -274,10 +298,17 @@ export default function Page() {
                 </h3>
               </div>
             </div>
-        <StatusFilter
+            <StatusFilter
               statusFilter={statusFilter}
               setStatusFilter={setStatusFilter}
             />
+
+            <div className="mb-6 mt-4 max-w-md">
+              <TechnicianFilter
+                technicianFilter={technicianFilter}
+                setTechnicianFilter={setTechnicianFilter}
+              />
+            </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {filteredServiceRequests.map((item) => (
@@ -292,6 +323,7 @@ export default function Page() {
                   value={item.value}
                   openedAt={item.openedAt}
                   status={item.status}
+                  technician={item.technician}
                   onStatusChange={changeServiceRequestStatus}
                   onDelete={deleteServiceRequest}
                 />
@@ -329,15 +361,15 @@ export default function Page() {
                     ref={inputphoneRef}
                     value={phoneSearch}
                     onChange={(event) =>
-                      setPhoneSearch(formatphone(event.target.value))
+                      setPhoneSearch(formatPhone(event.target.value))
                     }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2"
-                    placeholder="Customers phone"
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
+                    placeholder="Customer Phone"
                   />
 
                   <button
                     type="button"
-                    onClick={searchcustomer}
+                    onClick={searchCustomer}
                     className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
                   >
                     Search
@@ -376,51 +408,65 @@ export default function Page() {
                 value={customerName}
                 onChange={(event) => setCustomerName(event.target.value)}
                 readOnly={!customerNew && customerName !== ""}
-                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 ${
                   !customerNew && customerName !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Customer's name"
+                placeholder="Customer Name"
               />
 
               <input
                 value={customerPhone}
                 onChange={(event) => setCustomerPhone(event.target.value)}
                 readOnly={!customerNew && customerPhone !== ""}
-                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 ${
                   !customerNew && customerPhone !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Customer's phone"
+                placeholder="Customer Phone"
               />
 
               <input
                 value={customerAddress}
                 onChange={(event) => setCustomerAddress(event.target.value)}
                 readOnly={!customerNew && customerAddress !== ""}
-                className={`w-full border border-gray-300 rounded-lg px-3 py-2 ${
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 ${
                   !customerNew && customerAddress !== ""
                     ? "bg-gray-100"
                     : "bg-white"
                 }`}
-                placeholder="Customer's address"
+                placeholder="Customer Address"
               />
               <textarea
                 value={problemDescription}
                 onChange={(event) => setProblemDescription(event.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
                 placeholder="Problem description"
               />
 
               <h3 className="mb-1 text-xl font-bold text-gray-900">
-              Priority
-            </h3>
+                Technician
+              </h3>
+
+              <select
+                value={assignedTechnician}
+                onChange={(event) => setAssignedTechnician(event.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
+              >
+                {TECHNICIANS.map((technician) => (
+                  <option key={technician} value={technician}>
+                    {technician}
+                  </option>
+                ))}
+              </select>
+
+              <h3 className="mb-1 text-xl font-bold text-gray-900">Priority</h3>
               <select
                 value={priority}
                 onChange={(event) => setPriority(event.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
               >
                 <option>High</option>
                 <option>Medium</option>
@@ -432,7 +478,7 @@ export default function Page() {
               <button
                 type="button"
                 onClick={() => setNewServiceRequestOpen(false)}
-                className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300"
+                className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300 text-gray-900"
               >
                 Cancel
               </button>
