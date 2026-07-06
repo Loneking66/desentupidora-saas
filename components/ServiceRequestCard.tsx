@@ -1,11 +1,9 @@
 function statusColor(status: string) {
-  if (status === "Open")
-    return "bg-red-100 text-red-700"
+  if (status === "Open") return "bg-red-100 text-red-700";
 
-  if (status === "In Progress")
-    return "bg-yellow-100 text-yellow-700"
+  if (status === "In Progress") return "bg-yellow-100 text-yellow-700";
 
-  return "bg-green-100 text-green-700"
+  return "bg-green-100 text-green-700";
 }
 interface ServiceRequestCardProps {
   id: number;
@@ -19,11 +17,9 @@ interface ServiceRequestCardProps {
   status: string;
   technician: string;
 
-  onStatusChange: (
-    id: number,
-    newStatus: string
-  ) => void;
+  onStatusChange: (id: number, newStatus: string) => void;
   onDelete: (id: number) => void;
+  onEdit: (id: number) => void;
 }
 
 export default function ServiceRequestCard({
@@ -39,72 +35,70 @@ export default function ServiceRequestCard({
   technician,
   onStatusChange,
   onDelete,
+  onEdit,
 }: ServiceRequestCardProps) {
+  return (
+    <div className="min-w-0 bg-white p-5 rounded-2xl shadow border border-gray-200">
+      <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="text-lg font-bold text-gray-900">
+            #{id} - {customer}
+          </h3>
 
+          <p className="text-sm text-gray-500">
+            Opened on {new Date(openedAt).toLocaleDateString()}
+          </p>
+        </div>
 
-return (
-   <div className="min-w-0 bg-white p-5 rounded-2xl shadow border border-gray-200">
-    <div className="flex flex-col gap-3 mb-4 sm:flex-row sm:items-start sm:justify-between">
-      <div>
-        <h3 className="text-lg font-bold text-gray-900">
-          #{id} - {customer}
-        </h3>
-
-        <p className="text-sm text-gray-500">
-          Opened on {new Date(openedAt).toLocaleDateString()}
-        </p>
+        <select
+          value={status}
+          onChange={(event) => onStatusChange(id, event.target.value)}
+          className={`mt-2 w-full sm:w-56 rounded-lg border px-2 py-1 font-semibold ${statusColor(status)}`}
+        >
+          <option>Open</option>
+          <option>In Progress</option>
+          <option>Completed</option>
+        </select>
       </div>
 
-      <select
-  value={status}
-  onChange={(event) =>
-    onStatusChange(id, event.target.value)
-  }
-className={`mt-2 w-full sm:w-56 rounded-lg border px-2 py-1 font-semibold ${statusColor(status)}`}>
-  <option>Open</option>
-  <option>In Progress</option>
-  <option>Completed</option>
-</select>
+      <div className="space-y-2 text-sm text-gray-700">
+        <p>📞 {phone}</p>
+        <p>📍 {address}</p>
+        <p>🔧 {description}</p>
+      </div>
+
+      <div className="border-t border-gray-200 pt-4 mt-4">
+        <div className="flex items-start gap-3">
+          <span>👷‍♂️</span>
+
+          <div>
+            <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
+              {technician}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+        <span className="text-sm font-medium text-gray-900">⚠️ {priority}</span>
+
+        <span className="text-sm font-bold text-gray-900">R$ {value}</span>
+
+        <button
+          type="button"
+          onClick={() => onEdit(id)}
+          className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+        >
+          ✏️ Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(id)}
+          className="text-sm font-semibold text-red-600 hover:text-red-800"
+        >
+          🗑 Delete
+        </button>
+      </div>
     </div>
-
-
-    <div className="space-y-2 text-sm text-gray-700">
-      <p>📞 {phone}</p>
-      <p>📍 {address}</p>
-      <p>🔧 {description}</p>
-    </div>
-    
-<div className="border-t border-gray-200 pt-4 mt-4">
-  <div className="flex items-start gap-3">
-    <span>👷‍♂️</span>
-
-    <div>
-      <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
-        {technician}
-  </span>
-    </div>
-  </div>
-</div>
-
-    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-      <span className="text-sm font-medium text-gray-900">
-        ⚠️ {priority}
-      </span>
-
-      <span className="text-sm font-bold text-gray-900">
-        R$ {value}
-      </span>
-
-      <button
-        type="button"
-        onClick={() => onDelete(id)}
-        className="text-sm font-semibold text-red-600 hover:text-red-800"
-      >
-        Delete
-      </button>
-
-    </div>
-  </div>
-  
-)
+  );
 }

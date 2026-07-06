@@ -6,7 +6,11 @@ import ServiceRequestCard from "@/components/ServiceRequestCard";
 import { STATUS } from "@/constants/status";
 import StatusFilter from "@/components/StatusFilter";
 import TechnicianFilter from "@/components/technicianFilter";
-import { ALL_TECHNICIANS, TECHNICIANS } from "@/constants/technicians";
+import {
+  ALL_TECHNICIANS,
+  TECHNICIANS,
+  type Technician,
+} from "@/constants/technicians";
 
 type StatusValue = (typeof STATUS)[keyof typeof STATUS];
 
@@ -29,7 +33,9 @@ export default function Page() {
     useState<string>(ALL_TECHNICIANS);
   const [assignedTechnician, setAssignedTechnician] =
     React.useState<Technician>(TECHNICIANS[0]);
-
+  const [editingServiceRequestId, setEditingServiceRequestId] = React.useState<
+    number | null
+  >(null);
   // Improves user experience by automatically focusing the phone input
   // when the new service request form is opened. This allows the operator
   // to start typing the customer's phone number immediately without needing
@@ -243,6 +249,57 @@ export default function Page() {
       }),
     );
   }
+  // Edits an existing service request when the operator chooses to edit it.
+  function editServiceRequest(id: number) {
+    const serviceRequestToEdit = serviceRequests.find(
+      (serviceRequest) => serviceRequest.id === id,
+    );
+
+    if (!serviceRequestToEdit) {
+      alert("Service request not found.");
+      return;
+    }
+
+    setEditingServiceRequestId(id);
+    setCustomerName(serviceRequestToEdit.customer);
+    setCustomerPhone(serviceRequestToEdit.phone);
+    setCustomerAddress(serviceRequestToEdit.address);
+    setProblemDescription(serviceRequestToEdit.description);
+    setPriority(serviceRequestToEdit.priority);
+    setAssignedTechnician(serviceRequestToEdit.technician as Technician);
+    setNewServiceRequestOpen(true);
+  }
+  function handleSaveServiceRequest() {
+    if (editingServiceRequestId !== null) {
+      updateServiceRequest();
+      return;
+    }
+
+    saveServiceRequest();
+  }
+
+  function updateServiceRequest() {
+    setServiceRequests(
+      serviceRequests.map((serviceRequest) => {
+        if (serviceRequest.id !== editingServiceRequestId) {
+          return serviceRequest;
+        }
+
+        return {
+          ...serviceRequest,
+          customer: customerName,
+          phone: customerPhone,
+          address: customerAddress,
+          description: problemDescription,
+          priority: priority,
+          technician: assignedTechnician,
+        };
+      }),
+    );
+
+    setEditingServiceRequestId(null);
+    setNewServiceRequestOpen(false);
+  }
 
   // Removes a service request from the list when the operator chooses to delete it.
   function deleteServiceRequest(id: number) {
@@ -259,6 +316,10 @@ export default function Page() {
     );
   }
 
+  function closeServiceRequestModal() {
+    setEditingServiceRequestId(null);
+    setNewServiceRequestOpen(false);
+  }
   return (
     <div className="flex h-screen">
       <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
@@ -326,6 +387,7 @@ export default function Page() {
                   technician={item.technician}
                   onStatusChange={changeServiceRequestStatus}
                   onDelete={deleteServiceRequest}
+                  onEdit={editServiceRequest}
                 />
               ))}
             </div>
@@ -351,59 +413,68 @@ export default function Page() {
         {newServiceRequestOpen && (
           <form>
             <h3 className="mb-4 text-xl font-bold text-gray-900">
-              New Service Request
+              {editingServiceRequestId !== null
+                ? "Edit Service Request"
+                : "New Service Request"}
             </h3>
 
             <div className="space-y-3">
-              <div className="relative">
-                <div className="flex gap-2">
-                  <input
-                    ref={inputphoneRef}
-                    value={phoneSearch}
-                    onChange={(event) =>
-                      setPhoneSearch(formatPhone(event.target.value))
-                    }
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
-                    placeholder="Customer Phone"
-                  />
+              {editingServiceRequestId === null ? (
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputphoneRef}
+                      value={phoneSearch}
+                      onChange={(event) =>
+                        setPhoneSearch(formatPhone(event.target.value))
+                      }
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
+                      placeholder="Customer Phone"
+                    />
 
-                  <button
-                    type="button"
-                    onClick={searchCustomer}
-                    className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
-                  >
-                    Search
-                  </button>
-                </div>
-
-                {customerFound && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCustomerName(customerFound.customer);
-                      setCustomerPhone(customerFound.phone);
-                      setCustomerAddress(customerFound.address);
-                      setCustomerFound(null);
-                    }}
-                    className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
-                  >
-                    <div className="font-medium text-gray-900">
-                      👤 {customerFound.customer}
-                    </div>
-
-                    <div className="text-sm text-gray-500">
-                      📍 {customerFound.address}
-                    </div>
-                  </button>
-                )}
-
-                {messageSearch && (
-                  <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 shadow-lg">
-                    {messageSearch}
+                    <button
+                      type="button"
+                      onClick={searchCustomer}
+                      className="rounded-lg bg-gray-900 px-4 py-2 text-white hover:bg-gray-800"
+                    >
+                      Search
+                    </button>
                   </div>
-                )}
-              </div>
 
+                  {customerFound && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCustomerName(customerFound.customer);
+                        setCustomerPhone(customerFound.phone);
+                        setCustomerAddress(customerFound.address);
+                        setCustomerFound(null);
+                      }}
+                      className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-left shadow-lg transition hover:bg-blue-50"
+                    >
+                      <div className="font-medium text-gray-900">
+                        👤 {customerFound.customer}
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        📍 {customerFound.address}
+                      </div>
+                    </button>
+                  )}
+
+                  {messageSearch && (
+                    <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 shadow-lg">
+                      {messageSearch}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+                  <p className="font-medium text-blue-700">
+                    ✏️ Editing Request #{editingServiceRequestId}
+                  </p>
+                </div>
+              )}
               <input
                 value={customerName}
                 onChange={(event) => setCustomerName(event.target.value)}
@@ -452,7 +523,9 @@ export default function Page() {
 
               <select
                 value={assignedTechnician}
-                onChange={(event) => setAssignedTechnician(event.target.value)}
+                onChange={(event) =>
+                  setAssignedTechnician(event.target.value as Technician)
+                }
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
               >
                 {TECHNICIANS.map((technician) => (
@@ -477,7 +550,7 @@ export default function Page() {
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setNewServiceRequestOpen(false)}
+                onClick={() => closeServiceRequestModal()}
                 className="rounded-lg bg-gray-200 px-4 py-2 hover:bg-gray-300 text-gray-900"
               >
                 Cancel
@@ -485,7 +558,7 @@ export default function Page() {
 
               <button
                 type="button"
-                onClick={saveServiceRequest}
+                onClick={handleSaveServiceRequest}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
               >
                 Save
