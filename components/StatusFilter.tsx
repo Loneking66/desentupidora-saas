@@ -1,27 +1,31 @@
-import { STATUS } from "@/constants/status"
-
-type StatusValue = typeof STATUS[keyof typeof STATUS]
+import {
+  ALL_STATUSES,
+  STATUS,
+  type StatusFilterValue,
+} from "@/constants/status";
 
 type StatusFilterProps = {
-  statusFilter: StatusValue
-  setStatusFilter: (status: StatusValue) => void
-}
+  statusFilter: StatusFilterValue;
+  setStatusFilter: (status: StatusFilterValue) => void;
+};
 
 export default function StatusFilter({
   statusFilter,
   setStatusFilter,
 }: StatusFilterProps) {
-  const statuses: StatusValue[] = [
-    STATUS.All,
+  const statuses: StatusFilterValue[] = [
+    ALL_STATUSES,
     STATUS.OPEN,
     STATUS.IN_PROGRESS,
     STATUS.COMPLETED,
-  ]
+  ];
+
   return (
     <div className="flex gap-2 mb-4">
       {statuses.map((item) => (
         <button
           key={item}
+          type="button"
           onClick={() => setStatusFilter(item)}
           className={
             statusFilter === item
@@ -33,5 +37,5 @@ export default function StatusFilter({
         </button>
       ))}
     </div>
-  )
+  );
 }

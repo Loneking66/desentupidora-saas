@@ -3,7 +3,12 @@
 import React, { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import ServiceRequestCard from "@/components/ServiceRequestCard";
-import { STATUS } from "@/constants/status";
+import {
+  ALL_STATUSES,
+  STATUS,
+  type Status,
+  type StatusFilterValue,
+} from "@/constants/status";
 import StatusFilter from "@/components/StatusFilter";
 import TechnicianFilter from "@/components/technicianFilter";
 import {
@@ -12,12 +17,17 @@ import {
   type Technician,
 } from "@/constants/technicians";
 import ServiceRequestModal from "@/components/ServiceRequestModal";
+import {
+  PRIORITY,
+  type Priority,
+} from "@/constants/priority";
 
-type StatusValue = (typeof STATUS)[keyof typeof STATUS];
+import { ServiceRequest } from "@/types/serviceRequests";
+
 
 export default function Page() {
-  const [statusFilter, setStatusFilter] = React.useState<StatusValue>(
-    STATUS.All,
+  const [statusFilter, setStatusFilter] = React.useState<StatusFilterValue>(
+    ALL_STATUSES,
   );
   const [activeMenu, setActiveMenu] = React.useState("Service Requests");
   const [newServiceRequestOpen, setNewServiceRequestOpen] =
@@ -29,7 +39,7 @@ export default function Page() {
   const [customerPhone, setCustomerPhone] = React.useState("");
   const [customerAddress, setCustomerAddress] = React.useState("");
   const [problemDescription, setProblemDescription] = React.useState("");
-  const [priority, setPriority] = React.useState("Medium");
+  const [priority, setPriority] = React.useState<Priority>(PRIORITY.MEDIUM);
   const [technicianFilter, setTechnicianFilter] =
     useState<string>(ALL_TECHNICIANS);
   const [assignedTechnician, setAssignedTechnician] =
@@ -53,18 +63,20 @@ export default function Page() {
   // In a real application, this data would likely come from an API
   // and be persisted in a database. For this example, we are using in-memory state
   // to keep things simple.
-  const [serviceRequests, setServiceRequests] = React.useState([
+  const [serviceRequests, setServiceRequests] = React.useState<
+    ServiceRequest[]
+  >([
     {
       id: 1,
       customer: "João Silva",
       phone: "(11) 98765-4321",
       address: "Rua das Flores, 123",
       description: "Entupimento na pia da cozinha",
-      priority: "High",
+      priority: PRIORITY.HIGH,
       value: 150,
       openedAt: "2024-06-01T10:00:00Z",
-      status: "Open",
-      technician: "Carlos Oliveira",
+      status: STATUS.OPEN,
+      technician: TECHNICIANS[0],
     },
     {
       id: 2,
@@ -72,11 +84,11 @@ export default function Page() {
       phone: "(11) 98854-5411",
       address: "Rua das Árvores, 503",
       description: "Entupimento no vaso sanitário",
-      priority: "Low",
+      priority: PRIORITY.LOW,
       value: 300,
       openedAt: "2024-06-01T10:00:00Z",
-      status: "In Progress",
-      technician: "João Pedro",
+      status: STATUS.IN_PROGRESS,
+      technician: TECHNICIANS[1],
     },
     {
       id: 3,
@@ -84,11 +96,11 @@ export default function Page() {
       phone: "(11) 98745-3210",
       address: "Rua das Pedras, 203",
       description: "Entupimento de ralo",
-      priority: "Medium",
+      priority: PRIORITY.MEDIUM,
       value: 450,
       openedAt: "2024-06-01T10:00:00Z",
-      status: "Completed",
-      technician: "Marcos Vinicius",
+      status: STATUS.COMPLETED,
+      technician: TECHNICIANS[2],
     },
   ]);
 
@@ -97,20 +109,20 @@ export default function Page() {
   // to reflect the current status of all service requests. This ensures that the dashboard
   // always shows up-to-date information without needing manual refreshes.
   const totalOpen = serviceRequests.filter(
-    (item) => item.status === "Open",
+    (item) => item.status === STATUS.OPEN,
   ).length;
 
   const totalInProgress = serviceRequests.filter(
-    (item) => item.status === "In Progress",
+    (item) => item.status === STATUS.IN_PROGRESS,
   ).length;
 
   const totalCompleted = serviceRequests.filter(
-    (item) => item.status === "Completed",
+    (item) => item.status === STATUS.COMPLETED,
   ).length;
 
   const filteredServiceRequests = serviceRequests.filter((serviceRequest) => {
     const matchesStatus =
-      statusFilter === "All" || serviceRequest.status === statusFilter;
+      statusFilter === ALL_STATUSES || serviceRequest.status === statusFilter;
 
     const matchesTechnician =
       technicianFilter === ALL_TECHNICIANS ||
@@ -199,7 +211,7 @@ export default function Page() {
       priority: priority,
       value: 0,
       openedAt: new Date().toISOString(),
-      status: "Open",
+      status: STATUS.OPEN,
       technician: assignedTechnician,
     };
 
@@ -209,7 +221,7 @@ export default function Page() {
     setCustomerPhone("");
     setCustomerAddress("");
     setProblemDescription("");
-    setPriority("Medium");
+    setPriority(PRIORITY.MEDIUM);
     setPhoneSearch("");
     setCustomerFound(null);
     setMessageSearch("");
@@ -227,7 +239,7 @@ export default function Page() {
   // This helps maintain the quality of service and ensures that
   //  no service request is left unattended due to status changes.
 
-  function changeServiceRequestStatus(id: number, newStatus: string) {
+  function changeServiceRequestStatus(id: number, newStatus: Status) {
     setServiceRequests(
       serviceRequests.map((serviceRequest) => {
         if (serviceRequest.id !== id) {

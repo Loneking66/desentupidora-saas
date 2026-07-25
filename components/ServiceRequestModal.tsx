@@ -1,5 +1,7 @@
 import type { RefObject } from "react";
 
+import { PRIORITY, type Priority } from "@/constants/priority";
+
 import { TECHNICIANS } from "@/constants/technicians";
 type Technician = (typeof TECHNICIANS)[number];
 
@@ -10,7 +12,7 @@ type ServiceRequestModalProps = {
   customerAddress: string;
   problemDescription: string;
   assignedTechnician: Technician;
-  priority: string;
+  priority: Priority;
   inputPhoneRef: RefObject<HTMLInputElement | null>;
   phoneSearch: string;
   formatPhone: (value: string) => string;
@@ -27,7 +29,7 @@ type ServiceRequestModalProps = {
   customerNew: boolean;
   setProblemDescription: (value: string) => void;
   setAssignedTechnician: (value: Technician) => void;
-  setPriority: (value: string) => void;
+  setPriority: (priority: Priority) => void;
   closeServiceRequestModal: () => void;
   handleSaveServiceRequest: () => void;
   // More props can be added here as needed
@@ -185,12 +187,12 @@ export default function ServiceRequestModal({
         <h3 className="mb-1 text-xl font-bold text-gray-900">Priority</h3>
         <select
           value={priority}
-          onChange={(event) => setPriority(event.target.value)}
+          onChange={(event) => setPriority(event.target.value as Priority)}
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900"
         >
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
+          <option value={PRIORITY.HIGH}>{PRIORITY.HIGH}</option>
+          <option value={PRIORITY.MEDIUM}>{PRIORITY.MEDIUM}</option>
+          <option value={PRIORITY.LOW}>{PRIORITY.LOW}</option>
         </select>
       </div>
 

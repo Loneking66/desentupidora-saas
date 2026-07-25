@@ -1,26 +1,30 @@
-function statusColor(status: string) {
-  if (status === "Open") return "bg-red-100 text-red-700";
+import { STATUS, type Status } from "@/constants/status";
+import { type Priority } from "@/constants/priority";
+import { type Technician } from "@/constants/technicians";
 
-  if (status === "In Progress") return "bg-yellow-100 text-yellow-700";
+function statusColor(status: Status) {
+  if (status === STATUS.OPEN) return "bg-red-100 text-red-700";
+
+  if (status === STATUS.IN_PROGRESS) return "bg-yellow-100 text-yellow-700";
 
   return "bg-green-100 text-green-700";
 }
-interface ServiceRequestCardProps {
+
+type ServiceRequestCardProps = {
   id: number;
   customer: string;
   phone: string;
   address: string;
   description: string;
-  priority: string;
+  priority: Priority;
   value: number;
   openedAt: string;
-  status: string;
-  technician: string;
-
-  onStatusChange: (id: number, newStatus: string) => void;
+  status: Status;
+  technician: Technician;
+  onStatusChange: (id: number, newStatus: Status) => void;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
-}
+};
 
 export default function ServiceRequestCard({
   id,
@@ -52,12 +56,12 @@ export default function ServiceRequestCard({
 
         <select
           value={status}
-          onChange={(event) => onStatusChange(id, event.target.value)}
+          onChange={(event) => onStatusChange(id, event.target.value as Status)}
           className={`mt-2 w-full sm:w-56 rounded-lg border px-2 py-1 font-semibold ${statusColor(status)}`}
         >
-          <option>Open</option>
-          <option>In Progress</option>
-          <option>Completed</option>
+          <option value={STATUS.OPEN}>{STATUS.OPEN}</option>
+          <option value={STATUS.IN_PROGRESS}>{STATUS.IN_PROGRESS}</option>
+          <option value={STATUS.COMPLETED}>{STATUS.COMPLETED}</option>
         </select>
       </div>
 
