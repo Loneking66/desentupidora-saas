@@ -18,8 +18,11 @@ import {
 } from "@/constants/technicians";
 import ServiceRequestModal from "@/components/ServiceRequestModal";
 import { PRIORITY, type Priority } from "@/constants/priority";
+import type {
+  CreateServiceRequestInput,
+  ServiceRequest,
+} from "@/types/serviceRequests";
 
-import { ServiceRequest } from "@/types/serviceRequests";
 
 export default function Page() {
   const [statusFilter, setStatusFilter] =
@@ -167,7 +170,7 @@ export default function Page() {
   }
 
   // Creates a new service request based on the information entered in the form.
-  function saveServiceRequest() {
+  async function saveServiceRequest() {
     if (
       !customerName ||
       !customerPhone ||
@@ -177,21 +180,35 @@ export default function Page() {
       alert("Fill in all fields to create a new service request.");
       return;
     }
-
-    const newServiceRequest = {
-      id: serviceRequests.length + 1,
+    
+    const input: CreateServiceRequestInput = {
       customer: customerName,
       phone: customerPhone,
       address: customerAddress,
       description: problemDescription,
-      priority: priority,
-      value: 0,
-      openedAt: new Date().toISOString(),
-      status: STATUS.OPEN,
+      priority,
       technician: assignedTechnician,
     };
+    try {
 
-    setServiceRequests([...serviceRequests, newServiceRequest]);
+    const response = await fetch("/api/service-requests", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create service request.");
+    }
+
+    const createdServiceRequest: ServiceRequest = await response.json();
+
+    setServiceRequests((currrent) => [
+      ...currrent,
+      createdServiceRequest,
+    ]);
 
     setCustomerName("");
     setCustomerPhone("");
@@ -202,8 +219,11 @@ export default function Page() {
     setCustomerFound(null);
     setMessageSearch("");
     setCustomerNew(false);
-
     setNewServiceRequestOpen(false);
+  } catch (error) {
+    console.error(error);
+    alert("It was not possible to create the service resquest.");  
+  }
   }
 
   // Refreshes the status of a service request when the operator changes it.
@@ -258,18 +278,16 @@ export default function Page() {
     setAssignedTechnician(serviceRequestToEdit.technician as Technician);
     setNewServiceRequestOpen(true);
   }
-  function handleSaveServiceRequest() {
+ async function handleSaveServiceRequest() {
     if (editingServiceRequestId !== null) {
       updateServiceRequest();
       return;
     }
 
-    saveServiceRequest();
+    await  saveServiceRequest();
   }
-
   function updateServiceRequest() {
-    setServiceRequests(
-      serviceRequests.map((serviceRequest) => {
+    setServiceRequests((current) => current.map((serviceRequest) => {
         if (serviceRequest.id !== editingServiceRequestId) {
           return serviceRequest;
         }
