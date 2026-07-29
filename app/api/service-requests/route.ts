@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { mockServiceRequests } from "@/data/mockedServiceRequests";
 import { STATUS } from "@/constants/status";
 
+
 import type {
   CreateServiceRequestInput,
   ServiceRequest,
